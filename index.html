@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KNOSK HR System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  :root{
+    --knosk-navy:#0c2a52;
+    --knosk-blue:#1f5fa8;
+    --knosk-blue-light:#3f7fd1;
+    --knosk-gold:#f2a900;
+    --knosk-gold-light:#ffc94d;
+    --knosk-bg:#f5f7fb;
+    --knosk-line:#e4e9f2;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Segoe UI',ui-sans-serif,system-ui,sans-serif;background:var(--knosk-bg);color:var(--knosk-navy);margin:0;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:#c9d4e5;border-radius:8px;}
+  .brand-grad{background:linear-gradient(135deg,var(--knosk-navy) 0%,var(--knosk-blue) 60%,var(--knosk-blue-light) 100%);}
+  .gold-grad{background:linear-gradient(135deg,var(--knosk-gold) 0%,var(--knosk-gold-light) 100%);}
+  .card{background:#fff;border:1px solid var(--knosk-line);border-radius:14px;}
+  .btn-primary{background:var(--knosk-navy);color:#fff;border-radius:10px;padding:8px 16px;font-weight:600;font-size:14px;transition:.15s;}
+  .btn-primary:hover{background:var(--knosk-blue);}
+  .btn-gold{background:var(--knosk-gold);color:#0c2a52;border-radius:10px;padding:8px 16px;font-weight:700;font-size:14px;transition:.15s;}
+  .btn-gold:hover{background:var(--knosk-gold-light);}
+  .btn-ghost{background:transparent;color:var(--knosk-navy);border:1px solid var(--knosk-line);border-radius:10px;padding:7px 14px;font-weight:600;font-size:13px;}
+  .btn-ghost:hover{background:#eef2f9;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:#cfe0f5;font-size:14px;font-weight:500;cursor:pointer;transition:.15s;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+  .nav-item.active{background:var(--knosk-gold);color:var(--knosk-navy);font-weight:700;}
+  .tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#7086a8;padding:10px 14px;border-bottom:1px solid var(--knosk-line);}
+  .tbl td{padding:10px 14px;font-size:13.5px;border-bottom:1px solid var(--knosk-line);vertical-align:middle;}
+  .tbl tr:hover td{background:#f9fbfe;}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(12,42,82,.55);backdrop-filter:blur(2px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal-box{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;padding:26px;}
+  input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],select,textarea{
+    width:100%;border:1px solid var(--knosk-line);border-radius:9px;padding:8px 11px;font-size:13.5px;background:#fbfcfe;color:var(--knosk-navy);
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--knosk-gold);outline-offset:1px;border-color:var(--knosk-gold);}
+  label.field-label{font-size:12px;font-weight:700;color:#5b6f8c;margin-bottom:4px;display:block;}
+  .tab-scroll::-webkit-scrollbar{display:none;}
+  .pill-track-ngo{background:#e7f0ff;color:#1f5fa8;}
+  .pill-track-school{background:#fff3d6;color:#a06b00;}
+  .sev-info{background:#e7f0ff;color:#1f5fa8;}
+  .sev-warning{background:#fff3d6;color:#a06b00;}
+  .sev-critical{background:#fde3e3;color:#b3261e;}
+  .status-active{background:#e3f8ea;color:#1a7f43;}
+  .status-onboarding{background:#e7f0ff;color:#1f5fa8;}
+  .status-probation{background:#fff3d6;color:#a06b00;}
+  .status-offboarding{background:#fde3e3;color:#b3261e;}
+  .status-departed{background:#eceff4;color:#5b6f8c;}
+  .status-candidate{background:#f1e9ff;color:#6a3fc4;}
+  .status-reassigned{background:#e0f7f5;color:#0a7d72;}
+  #orgCanvasWrap{position:relative;width:100%;height:72vh;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #12335e 0%, #0a1f3d 70%, #071730 100%);}
+  .org-node-box{pointer-events:auto;cursor:pointer;user-select:none;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.25);white-space:nowrap;transition:transform .15s;}
+  .org-node-box:hover{transform:scale(1.06);}
+  .org-node-box .sub{display:block;font-weight:500;font-size:10.5px;opacity:.85;margin-top:2px;}
+  .spin{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .fade-in{animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+
+/* ============================================================================
+   0. CONFIG / SUPABASE CLIENT
+============================================================================ */
+const SUPABASE_URL = 'https://awjqdkjwypjzvtbzzahn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3anFka2p3eXBqenZ0Ynp6YWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzE5ODIsImV4cCI6MjEwMDE0Nzk4Mn0.GIK89kivC43Jnz1x4pwHdbHy1vOtw-XOMsDURkGA_X4';
+
+let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let session = null;
+let currentAppUser = null; // row from app_users
+
+/* ============================================================================
+   1. STATIC LOOKUPS
+============================================================================ */
+const TRACKS = ['ngo','school'];
+const STAFF_STATUSES = ['candidate','onboarding','active','probation','offboarding','departed','reassigned'];
+const EMPLOYMENT_TYPES = ['fulltime','parttime','volunteer','nysc','contract'];
+const DOC_TYPES = ['offer_letter','signed_contract','job_description','id_document','guarantor_letter','qualification_certificate','safeguarding_declaration','trc_registration','handbook_acknowledgement','other'];
+const DOC_STATUSES = ['missing','pending','on_file','expired'];
+const ACCESS_TYPES = ['whatsapp_group','email','shared_drive','platform_login','physical_asset','other'];
+const ACCESS_STATUSES = ['active','revoked','pending'];
+const OFFBOARD_REASONS = ['resignation','dismissal','end_of_probation','end_of_contract','internal_reassignment'];
+const SEVERITIES = ['info','warning','critical'];
+const APP_ROLES = ['super_admin','hr_admin','department_lead','viewer'];
+
+const NAV = [
+  {key:'dashboard', label:'Dashboard', icon:'📊'},
+  {key:'staff', label:'Staff Registry', icon:'🧑‍💼'},
+  {key:'offer_letters', label:'Offer Letters', icon:'📝'},
+  {key:'documents', label:'Documents', icon:'📁'},
+  {key:'access_items', label:'Access Inventory', icon:'🔑'},
+  {key:'onboarding_cases', label:'Onboarding', icon:'🚪'},
+  {key:'offboarding_cases', label:'Offboarding', icon:'🏁'},
+  {key:'reassignments', label:'Reassignments', icon:'🔀'},
+  {key:'organogram', label:'Live Organogram (3D)', icon:'🌐'},
+  {key:'departments', label:'Departments', icon:'🏢'},
+  {key:'job_descriptions', label:'Job Descriptions', icon:'📄'},
+  {key:'alerts', label:'Alerts & Flags', icon:'🚩'},
+  {key:'audit_log', label:'Audit Log', icon:'🕵️'},
+  {key:'settings', label:'Settings', icon:'⚙️'},
+];
+
+let state = {
+  route: 'dashboard',
+  staffCache: [],
+  departmentsCache: [],
+  loading: false,
+};
+
+/* ============================================================================
+   2. GENERIC ENTITY CONFIG (drives table + form rendering)
+============================================================================ */
+async function staffOptions(){
+  const {data} = await supabase.from('staff').select('id, full_name, job_title').order('full_name');
+  return (data||[]).map(s=>({value:s.id, label:`${s.full_name} — ${s.job_title||''}`}));
+}
+async function deptOptions(){
+  const {data} = await supabase.from('departments').select('id, name').order('name');
+  return (data||[]).map(d=>({value:d.id, label:d.name}));
+}
+async function jdOptions(){
+  const {data} = await supabase.from('job_descriptions').select('id, job_title, track').order('job_title');
+  return (data||[]).map(d=>({value:d.id, label:`${d.job_title} (${d.track})`}));
+}
+async function onboardingCaseOptions(){
+  const {data} = await supabase.from('onboarding_cases').select('id, staff_id, staff:staff_id(full_name)').limit(200);
+  return (data||[]).map(d=>({value:d.id, label:`${d.staff?.full_name||'—'} (${d.id.slice(0,8)})`}));
+}
+
+const ENTITIES = {
+  staff: {
+    table:'staff', title:'Staff Registry', pk:'id',
+    select:'*, department:department_id(name), reports_to:reports_to_staff_id(full_name)',
+    order:{col:'full_name', asc:true},
+    columns:[
+      {key:'full_name', label:'Name'},
+      {key:'job_title', label:'Title'},
+      {key:'track', label:'Track', render:v=>trackBadge(v)},
+      {key:'department', label:'Department', render:v=>v?.name||'—'},
+      {key:'status', label:'Status', render:v=>statusBadge(v)},
+      {key:'start_date', label:'Start Date'},
+    ],
+    fields:[
+      {key:'full_name', label:'Full Name', type:'text', required:true},
+      {key:'personal_email', label:'Personal Email', type:'email'},
+      {key:'personal_phone', label:'Personal Phone', type:'text'},
+      {key:'knosk_email', label:'KNOSK Email', type:'email'},
+      {key:'job_title', label:'Job Title (must match approved JD exactly)', type:'text', required:true},
+      {key:'track', label:'Track', type:'select', options:TRACKS.map(t=>({value:t,label:t})), required:true},
+      {key:'department_id', label:'Department', type:'select', optionsFn:deptOptions},
+      {key:'entity', label:'Entity', type:'select', options:[
+        {value:'KNOSK Charity Education Initiative', label:'KNOSK Charity Education Initiative'},
+        {value:'KNOSK N100-A-Day Charity Secondary School', label:'KNOSK N100-A-Day Charity Secondary School'}], required:true},
+      {key:'reports_to_staff_id', label:'Reports To', type:'select', optionsFn:staffOptions},
+      {key:'employment_type', label:'Employment Type', type:'select', options:EMPLOYMENT_TYPES.map(t=>({value:t,label:t}))},
+      {key:'status', label:'Status', type:'select', options:STAFF_STATUSES.map(t=>({value:t,label:t}))},
+      {key:'start_date', label:'Start Date', type:'date'},
+      {key:'monthly_salary', label:'Monthly Salary (₦)', type:'number'},
+      {key:'trc_registration_status', label:'TRC Registration Status (school track)', type:'text'},
+      {key:'safeguarding_declaration_signed', label:'Safeguarding Declaration Signed', type:'checkbox'},
+      {key:'guarantor_requested_date', label:'Guarantor Requested Date', type:'date'},
+      {key:'guarantor_received_date', label:'Guarantor Received Date', type:'date'},
+      {key:'induction_video_watched', label:'Induction Video Watched', type:'checkbox'},
+      {key:'handbook_signed', label:'Handbook Signed', type:'checkbox'},
+      {key:'notes', label:'Notes', type:'textarea'},
+    ]
+  },
+  departments: {
+    table:'departments', title:'Departments', pk:'id', select:'*', order:{col:'name', asc:true},
+    columns:[
+      {key:'name', label:'Name'},
+      {key:'track', label:'Track', render:v=>trackBadge(v)},
+      {key:'jd_on_file', label:'JD on File', render:v=>v?'✅':'⚠️ Missing'},
+      {key:'standard_notes', label:'Standard Notes'},
+    ],
+    fields:[
+      {key:'name', label:'Department Name', type:'text', required:true},
+      {key:'track', label:'Track', type:'select', options:TRACKS.map(t=>({value:t,label:t})), required:true},
+      {key:'jd_on_file', label:'JD on File', type:'checkbox'},
+      {key:'standard_notes', label:'"What good looks like" standard', type:'textarea'},
+    ]
+  },
+  job_descriptions: {
+    table:'job_descriptions', title:'Job Descriptions', pk:'id', select:'*, department:department_id(name)', order:{col:'job_title', asc:true},
+    columns:[
+      {key:'job_title', label:'Job Title'},
+      {key:'track', label:'Track', render:v=>trackBadge(v)},
+      {key:'department', label:'Department', render:v=>v?.name||'—'},
+      {key:'approved', label:'Approved', render:v=>v?'✅':'⏳ Draft'},
+    ],
+    fields:[
+      {key:'job_title', label:'Job Title', type:'text', required:true},
+      {key:'track', label:'Track', type:'select', options:TRACKS.map(t=>({value:t,label:t})), required:true},
+      {key:'department_id', label:'Department', type:'select', optionsFn:deptOptions},
+      {key:'reports_to_title', label:'Reports To (title)', type:'text'},
+      {key:'scope_summary', label:'Role Scope Summary', type:'textarea'},
+      {key:'approved', label:'Approved', type:'checkbox'},
+      {key:'approved_date', label:'Approved Date', type:'date'},
+    ]
+  },
+  offer_letters: {
+    table:'offer_letters', title:'Offer Letters', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'job_title', label:'Job Title'},
+      {key:'track', label:'Track', render:v=>trackBadge(v)},
+      {key:'status', label:'Status', render:v=>`<span class="badge status-${v==='signed'?'active':'onboarding'}">${v}</span>`},
+      {key:'monthly_salary', label:'Salary (₦)'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'job_description_id', label:'Linked Job Description', type:'select', optionsFn:jdOptions},
+      {key:'job_title', label:'Job Title', type:'text', required:true},
+      {key:'track', label:'Track', type:'select', options:TRACKS.map(t=>({value:t,label:t})), required:true},
+      {key:'entity', label:'Entity', type:'select', options:[
+        {value:'KNOSK Charity Education Initiative', label:'KNOSK Charity Education Initiative'},
+        {value:'KNOSK N100-A-Day Charity Secondary School', label:'KNOSK N100-A-Day Charity Secondary School'}]},
+      {key:'reporting_line_title', label:'Reporting Line (title)', type:'text'},
+      {key:'scope_summary', label:'Role Scope (pasted from JD)', type:'textarea'},
+      {key:'monthly_salary', label:'Monthly Salary (₦)', type:'number'},
+      {key:'health_insurance', label:'Health Insurance', type:'checkbox'},
+      {key:'health_insurance_duration', label:'Health Insurance Duration', type:'text'},
+      {key:'accommodation', label:'Accommodation', type:'select', options:[{value:'none',label:'None'},{value:'free',label:'Free'},{value:'subsidized',label:'Subsidized'}]},
+      {key:'working_hours', label:'Working Hours', type:'text'},
+      {key:'policy_acknowledgment_included', label:'Policy Acknowledgment Clause Included', type:'checkbox'},
+      {key:'offboarding_handover_clause_included', label:'Offboarding & Handover Clause Included', type:'checkbox'},
+      {key:'safeguarding_clause_included', label:'Safeguarding Clause Included (Academic)', type:'checkbox'},
+      {key:'fundraising_visibility_clause_included', label:'Fundraising/Visibility Clause Included (NGO)', type:'checkbox'},
+      {key:'signatory', label:'Signatory', type:'text'},
+      {key:'co_signatory', label:'Co-Signatory', type:'text'},
+      {key:'status', label:'Status', type:'select', options:['draft','sent','signed','declined'].map(t=>({value:t,label:t}))},
+      {key:'signed_date', label:'Signed Date', type:'date'},
+    ]
+  },
+  documents: {
+    table:'documents', title:'Document Inventory', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'doc_type', label:'Type'},
+      {key:'status', label:'Status', render:v=>docStatusBadge(v)},
+      {key:'issued_date', label:'Issued'},
+      {key:'expiry_date', label:'Expires'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'doc_type', label:'Document Type', type:'select', options:DOC_TYPES.map(t=>({value:t,label:t})), required:true},
+      {key:'title', label:'Title / Description', type:'text'},
+      {key:'status', label:'Status', type:'select', options:DOC_STATUSES.map(t=>({value:t,label:t}))},
+      {key:'file_url', label:'File URL', type:'text'},
+      {key:'issued_date', label:'Issued Date', type:'date'},
+      {key:'expiry_date', label:'Expiry Date', type:'date'},
+      {key:'notes', label:'Notes', type:'textarea'},
+    ]
+  },
+  access_items: {
+    table:'access_items', title:'Access Inventory', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'access_type', label:'Type'},
+      {key:'name', label:'Access Name'},
+      {key:'status', label:'Status', render:v=>accessStatusBadge(v)},
+      {key:'granted_date', label:'Granted'},
+      {key:'revoked_date', label:'Revoked'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'access_type', label:'Access Type', type:'select', options:ACCESS_TYPES.map(t=>({value:t,label:t})), required:true},
+      {key:'name', label:'Access Name (e.g. "Comms WhatsApp Group")', type:'text', required:true},
+      {key:'status', label:'Status', type:'select', options:ACCESS_STATUSES.map(t=>({value:t,label:t}))},
+      {key:'granted_date', label:'Granted Date', type:'date'},
+      {key:'revoked_date', label:'Revoked Date', type:'date'},
+      {key:'granted_by', label:'Granted By', type:'text'},
+      {key:'notes', label:'Notes', type:'textarea'},
+    ]
+  },
+  onboarding_cases: {
+    table:'onboarding_cases', title:'Onboarding Tracker', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'track', label:'Track', render:v=>trackBadge(v)},
+      {key:'stage', label:'Stage'},
+      {key:'gate_passed', label:'Gate Passed', render:v=>v?'✅':'⏳'},
+      {key:'staff_profile_activated', label:'Profile Active', render:v=>v?'✅':'⏳'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'track', label:'Track', type:'select', options:TRACKS.map(t=>({value:t,label:t})), required:true},
+      {key:'stage', label:'Stage', type:'select', options:['part_a','vision_casting','department','complete'].map(t=>({value:t,label:t}))},
+      {key:'vision_casting_watched', label:'Vision-Casting Video Watched', type:'checkbox'},
+      {key:'gate_passed', label:'Gate Passed (video + handbook + docs)', type:'checkbox'},
+      {key:'staff_profile_activated', label:'Staff Profile Activated', type:'checkbox'},
+      {key:'access_record_built', label:'Access Record Built', type:'checkbox'},
+      {key:'started_at', label:'Started', type:'date'},
+      {key:'completed_at', label:'Completed', type:'date'},
+    ]
+  },
+  offboarding_cases: {
+    table:'offboarding_cases', title:'Offboarding Tracker', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'reason', label:'Reason'},
+      {key:'status', label:'Status', render:v=>`<span class="badge status-${v==='closed'?'departed':'offboarding'}">${v}</span>`},
+      {key:'handover_reviewed_by_supervisor', label:'Handover Reviewed', render:v=>v?'✅':'⚠️'},
+      {key:'access_fully_revoked', label:'Access Revoked', render:v=>v?'✅':'⚠️'},
+      {key:'pay_withheld', label:'Pay Withheld', render:v=>v?'🚩 Yes':'—'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'reason', label:'Reason', type:'select', options:OFFBOARD_REASONS.map(t=>({value:t,label:t})), required:true},
+      {key:'notice_given_date', label:'Notice Given Date', type:'date'},
+      {key:'last_working_day', label:'Last Working Day', type:'date'},
+      {key:'handover_folder_name', label:'Handover Folder Name (Handover — [Role] — [Dept/Subject])', type:'text'},
+      {key:'handover_folder_link', label:'Handover Folder Link', type:'text'},
+      {key:'handover_content_complete', label:'Handover Content Complete', type:'checkbox'},
+      {key:'handover_reviewed_by_supervisor', label:'Handover Reviewed & Accepted by Supervisor', type:'checkbox'},
+      {key:'handover_reviewed_date', label:'Handover Reviewed Date', type:'date'},
+      {key:'equipment_returned', label:'Equipment Returned', type:'checkbox'},
+      {key:'equipment_notes', label:'Equipment Notes', type:'text'},
+      {key:'access_fully_revoked', label:'Access Fully Revoked', type:'checkbox'},
+      {key:'final_pay_processed', label:'Final Pay Processed', type:'checkbox'},
+      {key:'exit_interview_done', label:'Exit Interview Done', type:'checkbox'},
+      {key:'exit_interview_notes', label:'Exit Interview Notes', type:'textarea'},
+      {key:'handover_incomplete_at_departure', label:'Handover Incomplete at Departure', type:'checkbox'},
+      {key:'pay_withheld', label:'Pay Withheld (Step 11 consequence)', type:'checkbox'},
+      {key:'pay_release_date', label:'Pay Release Date', type:'date'},
+      {key:'status', label:'Case Status', type:'select', options:['open','handover_in_progress','ready_to_close','closed'].map(t=>({value:t,label:t}))},
+    ]
+  },
+  reassignments: {
+    table:'reassignments', title:'Internal Reassignments', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'previous_job_title', label:'From'},
+      {key:'new_job_title', label:'To'},
+      {key:'status', label:'Status'},
+      {key:'effective_date', label:'Effective'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'previous_job_title', label:'Previous Job Title', type:'text'},
+      {key:'previous_department_id', label:'Previous Department', type:'select', optionsFn:deptOptions},
+      {key:'new_job_title', label:'New Job Title', type:'text'},
+      {key:'new_department_id', label:'New Department', type:'select', optionsFn:deptOptions},
+      {key:'new_offer_letter_or_addendum', label:'Documented Via', type:'select', options:[{value:'new_offer_letter',label:'New Offer Letter'},{value:'addendum',label:'Addendum'}]},
+      {key:'effective_date', label:'Effective Date', type:'date'},
+      {key:'partial_handover_required', label:'Partial Handover Required', type:'checkbox'},
+      {key:'partial_handover_complete', label:'Partial Handover Complete', type:'checkbox'},
+      {key:'general_onboarding_skipped', label:'General Onboarding Correctly Skipped', type:'checkbox'},
+      {key:'checkin_2week_done', label:'2-Week Check-in Done', type:'checkbox'},
+      {key:'checkin_30day_done', label:'30-Day Check-in Done', type:'checkbox'},
+      {key:'status', label:'Status', type:'select', options:['open','handover_pending','complete'].map(t=>({value:t,label:t}))},
+    ]
+  },
+  alerts: {
+    table:'alerts', title:'Alerts & Flags', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'alert_type', label:'Type'},
+      {key:'message', label:'Message'},
+      {key:'severity', label:'Severity', render:v=>`<span class="badge sev-${v}">${v}</span>`},
+      {key:'resolved', label:'Resolved', render:v=>v?'✅':'⏳'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions},
+      {key:'alert_type', label:'Alert Type', type:'text', required:true},
+      {key:'message', label:'Message', type:'textarea', required:true},
+      {key:'severity', label:'Severity', type:'select', options:SEVERITIES.map(t=>({value:t,label:t}))},
+      {key:'resolved', label:'Resolved', type:'checkbox'},
+    ]
+  },
+};
+
+/* ============================================================================
+   3. RENDER HELPERS
+============================================================================ */
+function trackBadge(v){ if(!v) return '—'; return `<span class="badge pill-track-${v}">${v.toUpperCase()}</span>`; }
+function statusBadge(v){ if(!v) return '—'; return `<span class="badge status-${v}">${v}</span>`; }
+function docStatusBadge(v){
+  const map={missing:'sev-critical', pending:'sev-warning', on_file:'status-active', expired:'sev-critical'};
+  return `<span class="badge ${map[v]||'sev-info'}">${v}</span>`;
+}
+function accessStatusBadge(v){
+  const map={active:'status-active', revoked:'status-departed', pending:'sev-warning'};
+  return `<span class="badge ${map[v]||'sev-info'}">${v}</span>`;
+}
+function esc(s){ return (s===null||s===undefined) ? '' : String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function timeAgo(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+
+/* ============================================================================
+   4. APP SHELL
+============================================================================ */
+const app = document.getElementById('app');
+
+function renderShell(innerHtml){
+  app.innerHTML = `
+  <div class="flex min-h-screen">
+    <aside class="w-64 brand-grad flex-shrink-0 hidden md:flex flex-col py-6 px-4">
+      <div class="flex items-center gap-3 px-2 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-lg" style="color:var(--knosk-navy)">K</div>
+        <div>
+          <div class="text-white font-extrabold text-base leading-none">KNOSK</div>
+          <div class="text-[11px] text-blue-200 font-medium tracking-wide">HR SYSTEM</div>
+        </div>
+      </div>
+      <nav class="flex-1 space-y-1 overflow-y-auto tab-scroll">
+        ${NAV.map(n=>`<div class="nav-item ${state.route===n.key?'active':''}" data-route="${n.key}"><span>${n.icon}</span><span>${n.label}</span></div>`).join('')}
+      </nav>
+      <div class="pt-4 border-t border-white/10 mt-4">
+        <div class="text-blue-200 text-xs px-2 mb-2">${currentAppUser?.full_name||session?.user?.email||''}<br><span class="uppercase text-[10px] tracking-wide text-blue-300">${currentAppUser?.role||''}</span></div>
+        <button id="signOutBtn" class="nav-item w-full"><span>🚪</span><span>Sign Out</span></button>
+      </div>
+    </aside>
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="md:hidden brand-grad px-4 py-3 flex items-center justify-between">
+        <div class="text-white font-bold">KNOSK HR</div>
+        <select id="mobileNav" class="!w-auto text-xs">
+          ${NAV.map(n=>`<option value="${n.key}" ${state.route===n.key?'selected':''}>${n.icon} ${n.label}</option>`).join('')}
+        </select>
+      </header>
+      <main class="flex-1 p-4 md:p-8 overflow-x-hidden">
+        ${innerHtml}
+      </main>
+    </div>
+  </div>`;
+  document.querySelectorAll('[data-route]').forEach(el=>el.addEventListener('click', ()=>{ state.route = el.dataset.route; router(); }));
+  document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.reload(); });
+  document.getElementById('mobileNav')?.addEventListener('change', e=>{ state.route = e.target.value; router(); });
+}
+
+function pageHeader(title, subtitle, actionHtml=''){
+  return `
+  <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold" style="color:var(--knosk-navy)">${title}</h1>
+      ${subtitle?`<p class="text-sm text-slate-500 mt-1 max-w-2xl">${subtitle}</p>`:''}
+    </div>
+    <div class="flex gap-2">${actionHtml}</div>
+  </div>`;
+}
+
+/* ============================================================================
+   5. LOGIN SCREEN
+============================================================================ */
+function renderLoginScreen(){
+  app.innerHTML = `
+  <div class="min-h-screen flex items-center justify-center p-6 brand-grad">
+    <div class="card w-full max-w-sm p-8 fade-in">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-xl gold-grad flex items-center justify-center font-black text-xl" style="color:var(--knosk-navy)">K</div>
+        <div>
+          <div class="font-extrabold text-lg">KNOSK HR System</div>
+          <div class="text-xs text-slate-500">Sign in to continue</div>
+        </div>
+      </div>
+      <div id="loginErr" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2 mb-3"></div>
+      <form id="loginForm" class="space-y-3">
+        <div><label class="field-label">Email</label><input required type="email" id="loginEmail"></div>
+        <div><label class="field-label">Password</label><input required type="password" id="loginPassword"></div>
+        <button class="btn-primary w-full mt-2" type="submit">Sign In</button>
+      </form>
+      <div class="text-center text-xs text-slate-400 my-3">— or —</div>
+      <button id="signUpBtn" class="btn-gold w-full">Create Account (first user becomes Super Admin)</button>
+    </div>
+  </div>`;
+  document.getElementById('loginForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const {error} = await supabase.auth.signInWithPassword({email, password});
+    if(error){ showLoginError(error.message); } else { boot(); }
+  });
+  document.getElementById('signUpBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if(!email || !password){ showLoginError('Enter an email and password above, then click Create Account.'); return; }
+    const {error} = await supabase.auth.signUp({email, password});
+    if(error){ showLoginError(error.message); } else { showLoginError('Account created. Check email for confirmation if required, then sign in.', true); }
+  });
+}
+function showLoginError(msg, ok=false){
+  const el = document.getElementById('loginErr');
+  el.textContent = msg; el.classList.remove('hidden');
+  if(ok){ el.classList.remove('text-red-600','bg-red-50','border-red-200'); el.classList.add('text-emerald-700','bg-emerald-50','border-emerald-200'); }
+}
+
+/* ============================================================================
+   6. GENERIC ENTITY TABLE + FORM MODAL
+============================================================================ */
+async function renderEntityPage(entityKey){
+  const cfg = ENTITIES[entityKey];
+  renderShell(`<div id="pageRoot">${pageHeader(cfg.title, '', `<button id="addBtn" class="btn-primary">+ Add ${cfg.title.replace(/s$/,'')}</button>`)}
+  <div class="card overflow-x-auto"><table class="tbl w-full" id="entityTable"><thead><tr>${cfg.columns.map(c=>`<th>${c.label}</th>`).join('')}<th></th></tr></thead>
+  <tbody><tr><td colspan="${cfg.columns.length+1}" class="text-center py-8 text-slate-400">Loading…</td></tr></tbody></table></div></div>`);
+  document.getElementById('addBtn').addEventListener('click', ()=>openEntityForm(entityKey));
+  await loadEntityTable(entityKey);
+}
+
+async function loadEntityTable(entityKey){
+  const cfg = ENTITIES[entityKey];
+  let q = supabase.from(cfg.table).select(cfg.select);
+  if(cfg.order) q = q.order(cfg.order.col, {ascending: cfg.order.asc});
+  const {data, error} = await q.limit(500);
+  const tbody = document.querySelector('#entityTable tbody');
+  if(error){ tbody.innerHTML = `<tr><td colspan="99" class="text-red-600 py-6 text-center">${esc(error.message)}</td></tr>`; return; }
+  if(!data || data.length===0){ tbody.innerHTML = `<tr><td colspan="99" class="text-center py-8 text-slate-400">No records yet. Click "Add" to create one.</td></tr>`; return; }
+  tbody.innerHTML = data.map(row=>`
+    <tr>
+      ${cfg.columns.map(c=>`<td>${c.render ? c.render(row[c.key]) : esc(row[c.key] ?? '—')}</td>`).join('')}
+      <td class="text-right whitespace-nowrap">
+        <button class="btn-ghost text-xs mr-1" data-edit="${row[cfg.pk]}">Edit</button>
+        <button class="btn-ghost text-xs text-red-600" data-del="${row[cfg.pk]}">Delete</button>
+      </td>
+    </tr>`).join('');
+  tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', ()=>openEntityForm(entityKey, b.dataset.edit)));
+  tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>deleteEntity(entityKey, b.dataset.del)));
+}
+
+async function deleteEntity(entityKey, id){
+  if(!confirm('Delete this record? This cannot be undone.')) return;
+  const cfg = ENTITIES[entityKey];
+  const {error} = await supabase.from(cfg.table).delete().eq(cfg.pk, id);
+  if(error) alert(error.message); else loadEntityTable(entityKey);
+}
+
+async function openEntityForm(entityKey, id=null){
+  const cfg = ENTITIES[entityKey];
+  let existing = {};
+  if(id){
+    const {data} = await supabase.from(cfg.table).select('*').eq(cfg.pk, id).single();
+    existing = data || {};
+  }
+  const optionCache = {};
+  for(const f of cfg.fields){
+    if(f.optionsFn){ optionCache[f.key] = await f.optionsFn(); }
+  }
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal-box fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-extrabold">${id?'Edit':'Add'} ${cfg.title.replace(/s$/,'')}</h2>
+        <button id="closeModal" class="text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+      </div>
+      <form id="entityForm" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        ${cfg.fields.map(f=>renderField(f, existing[f.key], optionCache[f.key])).join('')}
+        <div class="sm:col-span-2 flex justify-end gap-2 mt-3 pt-3 border-t">
+          <button type="button" id="cancelBtn" class="btn-ghost">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(backdrop);
+  const close = ()=>backdrop.remove();
+  backdrop.querySelector('#closeModal').addEventListener('click', close);
+  backdrop.querySelector('#cancelBtn').addEventListener('click', close);
+  backdrop.addEventListener('click', e=>{ if(e.target===backdrop) close(); });
+  backdrop.querySelector('#entityForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const payload = {};
+    for(const f of cfg.fields){
+      const el = document.getElementById('f_'+f.key);
+      if(!el) continue;
+      if(f.type==='checkbox') payload[f.key] = el.checked;
+      else if(f.type==='number') payload[f.key] = el.value===''? null : Number(el.value);
+      else payload[f.key] = el.value===''? null : el.value;
+    }
+    let error;
+    if(id){ ({error} = await supabase.from(cfg.table).update(payload).eq(cfg.pk, id)); }
+    else { ({error} = await supabase.from(cfg.table).insert(payload)); }
+    if(error){ alert(error.message); return; }
+    close();
+    loadEntityTable(entityKey);
+    if(entityKey==='staff') state.staffCache = [];
+  });
+}
+
+function renderField(f, value, options){
+  const val = value ?? '';
+  const wrapWide = (f.type==='textarea') ? 'sm:col-span-2' : '';
+  let input = '';
+  if(f.type==='select'){
+    const opts = f.options || options || [];
+    input = `<select id="f_${f.key}">${f.required?'':'<option value="">—</option>'}${opts.map(o=>`<option value="${esc(o.value)}" ${String(val)===String(o.value)?'selected':''}>${esc(o.label)}</option>`).join('')}</select>`;
+  } else if(f.type==='textarea'){
+    input = `<textarea id="f_${f.key}" rows="3">${esc(val)}</textarea>`;
+  } else if(f.type==='checkbox'){
+    return `<div class="flex items-center gap-2 pt-5"><input type="checkbox" id="f_${f.key}" ${val?'checked':''} class="w-4 h-4"><label for="f_${f.key}" class="text-sm font-medium">${f.label}</label></div>`;
+  } else {
+    input = `<input type="${f.type}" id="f_${f.key}" value="${esc(val)}" ${f.required?'required':''}>`;
+  }
+  return `<div class="${wrapWide}"><label class="field-label">${f.label}</label>${input}</div>`;
+}
+
+/* ============================================================================
+   7. DASHBOARD
+============================================================================ */
+async function renderDashboard(){
+  renderShell(`<div id="pageRoot">${pageHeader('Dashboard', 'Leadership view of the state of KNOSK\'s people, right now.')}
+  <div id="statGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card p-5">
+      <h3 class="font-bold mb-3">Open Alerts & Flags</h3>
+      <div id="alertList" class="space-y-2"></div>
+    </div>
+    <div class="card p-5">
+      <h3 class="font-bold mb-3">Staff by Track</h3>
+      <div id="trackChart" class="space-y-3"></div>
+      <h3 class="font-bold mt-6 mb-3">Staff by Status</h3>
+      <div id="statusChart" class="space-y-2"></div>
+    </div>
+  </div></div>`);
+
+  const [{data: staffAll}, {data: alertsOpen}, {data: offOpen}, {data: onOpen}] = await Promise.all([
+    supabase.from('staff').select('id, track, status'),
+    supabase.from('alerts').select('*, staff:staff_id(full_name)').eq('resolved', false).order('severity',{ascending:false}).limit(20),
+    supabase.from('offboarding_cases').select('id').neq('status','closed'),
+    supabase.from('onboarding_cases').select('id').neq('stage','complete'),
+  ]);
+
+  const total = staffAll?.length || 0;
+  const active = staffAll?.filter(s=>s.status==='active').length || 0;
+  const stats = [
+    {label:'Total Staff', value:total, icon:'🧑‍💼', color:'var(--knosk-navy)'},
+    {label:'Active', value:active, icon:'✅', color:'#1a7f43'},
+    {label:'Open Onboarding', value:onOpen?.length||0, icon:'🚪', color:'#1f5fa8'},
+    {label:'Open Offboarding', value:offOpen?.length||0, icon:'🏁', color:'#b3261e'},
+  ];
+  document.getElementById('statGrid').innerHTML = stats.map(s=>`
+    <div class="card p-5">
+      <div class="text-2xl mb-1">${s.icon}</div>
+      <div class="text-2xl font-extrabold" style="color:${s.color}">${s.value}</div>
+      <div class="text-xs text-slate-500 font-medium">${s.label}</div>
+    </div>`).join('');
+
+  const alertList = document.getElementById('alertList');
+  if(!alertsOpen || alertsOpen.length===0){ alertList.innerHTML = `<div class="text-sm text-slate-400 py-6 text-center">No open alerts. All clear.</div>`; }
+  else {
+    alertList.innerHTML = alertsOpen.map(a=>`
+      <div class="flex items-start justify-between gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50">
+        <div>
+          <div class="flex items-center gap-2 mb-1"><span class="badge sev-${a.severity}">${a.severity}</span><span class="text-xs text-slate-400">${a.alert_type}</span></div>
+          <div class="text-sm font-medium">${esc(a.message)}</div>
+          <div class="text-xs text-slate-400 mt-1">${a.staff?.full_name || ''}</div>
+        </div>
+        <button class="btn-ghost text-xs" data-resolve="${a.id}">Resolve</button>
+      </div>`).join('');
+    alertList.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click', async ()=>{
+      await supabase.from('alerts').update({resolved:true, resolved_at:new Date().toISOString()}).eq('id', b.dataset.resolve);
+      renderDashboard();
+    }));
+  }
+
+  const byTrack = {ngo:0, school:0};
+  (staffAll||[]).forEach(s=>{ if(s.track) byTrack[s.track] = (byTrack[s.track]||0)+1; });
+  document.getElementById('trackChart').innerHTML = Object.entries(byTrack).map(([k,v])=>barRow(k.toUpperCase(), v, total, k==='ngo'?'var(--knosk-blue)':'var(--knosk-gold)')).join('');
+
+  const byStatus = {};
+  (staffAll||[]).forEach(s=>{ byStatus[s.status] = (byStatus[s.status]||0)+1; });
+  document.getElementById('statusChart').innerHTML = Object.entries(byStatus).map(([k,v])=>barRow(k, v, total, 'var(--knosk-navy)')).join('');
+}
+function barRow(label, value, total, color){
+  const pct = total? Math.round((value/total)*100) : 0;
+  return `<div>
+    <div class="flex justify-between text-xs mb-1"><span class="font-medium">${label}</span><span class="text-slate-400">${value}</span></div>
+    <div class="w-full h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+}
+
+/* ============================================================================
+   8. AUDIT LOG
+============================================================================ */
+async function renderAuditLog(){
+  renderShell(`<div id="pageRoot">${pageHeader('Audit Log', 'Every insert, update, and delete across the system — who, what, when.')}
+  <div class="card overflow-x-auto"><table class="tbl w-full">
+  <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Table</th><th>Record</th></tr></thead>
+  <tbody id="auditBody"><tr><td colspan="5" class="text-center py-8 text-slate-400">Loading…</td></tr></tbody></table></div></div>`);
+  const {data, error} = await supabase.from('audit_log').select('*').order('created_at',{ascending:false}).limit(200);
+  const body = document.getElementById('auditBody');
+  if(error){ body.innerHTML = `<tr><td colspan="5" class="text-red-600 text-center py-6">${esc(error.message)}</td></tr>`; return; }
+  if(!data || data.length===0){ body.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">No audit events yet.</td></tr>`; return; }
+  body.innerHTML = data.map(a=>`<tr>
+    <td class="whitespace-nowrap text-xs text-slate-500">${timeAgo(a.created_at)}</td>
+    <td>${esc(a.actor_name||'system')}</td>
+    <td><span class="badge ${a.action==='insert'?'status-active':a.action==='delete'?'sev-critical':'sev-warning'}">${a.action}</span></td>
+    <td>${esc(a.table_name)}</td>
+    <td class="text-xs text-slate-400">${(a.record_id||'').slice(0,8)}</td>
+  </tr>`).join('');
+}
+
+/* ============================================================================
+   9. SETTINGS (role management)
+============================================================================ */
+async function renderSettings(){
+  renderShell(`<div id="pageRoot">${pageHeader('Settings', 'Manage user roles and department scoping.')}
+  <div class="card p-5 mb-6">
+    <h3 class="font-bold mb-3">Your Account</h3>
+    <p class="text-sm text-slate-500">Signed in as <b>${esc(session?.user?.email)}</b>, role <b>${esc(currentAppUser?.role)}</b>.</p>
+  </div>
+  <div class="card overflow-x-auto">
+    <div class="p-5 pb-0"><h3 class="font-bold mb-1">User Roles</h3><p class="text-sm text-slate-500 mb-3">Only Super Admins can edit roles.</p></div>
+    <table class="tbl w-full"><thead><tr><th>Name</th><th>Role</th><th>Department Scope</th><th></th></tr></thead>
+    <tbody id="usersBody"><tr><td colspan="4" class="text-center py-8 text-slate-400">Loading…</td></tr></tbody></table>
+  </div></div>`);
+
+  const {data, error} = await supabase.from('app_users').select('*');
+  const body = document.getElementById('usersBody');
+  if(error){ body.innerHTML = `<tr><td colspan="4" class="text-red-600 text-center py-6">${esc(error.message)}</td></tr>`; return; }
+  const depts = await deptOptions();
+  body.innerHTML = (data||[]).map(u=>`
+    <tr>
+      <td>${esc(u.full_name)}</td>
+      <td><select data-role="${u.id}" ${currentAppUser?.role!=='super_admin'?'disabled':''}>${APP_ROLES.map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select></td>
+      <td><select data-dept="${u.id}" ${currentAppUser?.role!=='super_admin'?'disabled':''}><option value="">—</option>${depts.map(d=>`<option value="${d.value}" ${u.department_id===d.value?'selected':''}>${d.label}</option>`).join('')}</select></td>
+      <td></td>
+    </tr>`).join('');
+  body.querySelectorAll('[data-role]').forEach(el=>el.addEventListener('change', async ()=>{
+    await supabase.from('app_users').update({role: el.value}).eq('id', el.dataset.role);
+  }));
+  body.querySelectorAll('[data-dept]').forEach(el=>el.addEventListener('change', async ()=>{
+    await supabase.from('app_users').update({department_id: el.value || null}).eq('id', el.dataset.dept);
+  }));
+}
+
+/* ============================================================================
+   10. 3D LIVE ORGANOGRAM
+============================================================================ */
+let orgThree = null; // holds renderers/scene for cleanup
+
+async function renderOrganogram(){
+  renderShell(`<div id="pageRoot">${pageHeader('Live Organogram', 'Linked to the Staff Registry. Drag to rotate, scroll to zoom, click a box to focus and expand its team.',
+    `<select id="orgTrackFilter" class="!w-auto text-sm">
+       <option value="all">All (NGO + School)</option>
+       <option value="ngo">NGO Track</option>
+       <option value="school">School Track</option>
+     </select>`)}
+  <div id="orgCanvasWrap">
+    <div id="orgLoading" class="absolute inset-0 flex items-center justify-center text-white/70 text-sm">Loading organogram…</div>
+  </div>
+  <p class="text-xs text-slate-400 mt-2">Tip: nodes are live — add or move staff in the Staff Registry and their reporting line updates here.</p>
+  </div>`);
+
+  document.getElementById('orgTrackFilter').addEventListener('change', e=>buildOrgChart(e.target.value));
+  await buildOrgChart('all');
+}
+
+async function buildOrgChart(filterTrack){
+  if(orgThree){ orgThree.dispose(); orgThree = null; }
+  const wrap = document.getElementById('orgCanvasWrap');
+  wrap.querySelectorAll('canvas, .css3d-root').forEach(n=>n.remove());
+  const loading = document.getElementById('orgLoading') || document.createElement('div');
+
+  const {data: nodes, error} = await supabase.from('org_nodes').select('*, staff:staff_id(id, full_name, job_title, status)').order('sort_order');
+  if(error){ wrap.innerHTML = `<div class="text-red-400 p-6 text-sm">${esc(error.message)}</div>`; return; }
+
+  const filtered = (nodes||[]).filter(n => filterTrack==='all' || n.track===filterTrack || n.track===null);
+  if(filtered.length===0){ wrap.innerHTML = `<div class="text-white/60 p-6 text-sm text-center">No organogram data for this filter.</div>`; return; }
+
+  // Build tree structure
+  const byId = {}; filtered.forEach(n=>byId[n.id]={...n, children:[]});
+  const roots = [];
+  filtered.forEach(n=>{
+    if(n.parent_node_id && byId[n.parent_node_id]) byId[n.parent_node_id].children.push(byId[n.id]);
+    else roots.push(byId[n.id]);
+  });
+
+  // Layout: simple tidy tree (level = depth, x = position among leaves)
+  const levelGapY = 130, siblingGapX = 210;
+  let leafCounter = 0;
+  function layout(node, depth){
+    node.depth = depth;
+    if(node.children.length===0){
+      node.x = leafCounter * siblingGapX; leafCounter++;
+    } else {
+      node.children.forEach(c=>layout(c, depth+1));
+      const xs = node.children.map(c=>c.x);
+      node.x = (Math.min(...xs)+Math.max(...xs))/2;
+    }
+    node.y = -depth * levelGapY;
+  }
+  roots.forEach(r=>layout(r, 0));
+
+  // Center all roots as a forest
+  const allX = Object.values(byId).map(n=>n.x);
+  const minX = Math.min(...allX), maxX = Math.max(...allX);
+  const centerOffset = (minX+maxX)/2;
+  Object.values(byId).forEach(n=>n.x -= centerOffset);
+
+  // ---- THREE.js scene (WebGL for connector lines + CSS3D for labels) ----
+  const width = wrap.clientWidth, height = wrap.clientHeight;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, width/height, 1, 5000);
+  camera.position.set(0, 220, 900);
+
+  const glRenderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+  glRenderer.setSize(width, height);
+  glRenderer.setClearColor(0x000000, 0);
+  glRenderer.domElement.style.position = 'absolute';
+  glRenderer.domElement.style.top = '0';
+  glRenderer.domElement.style.pointerEvents = 'none';
+  wrap.appendChild(glRenderer.domElement);
+
+  const cssRenderer = new CSS3DRenderer({width, height});
+  cssRenderer.setSize(width, height);
+  cssRenderer.domElement.className = 'css3d-root';
+  cssRenderer.domElement.style.position = 'absolute';
+  cssRenderer.domElement.style.top = '0';
+  wrap.appendChild(cssRenderer.domElement);
+
+  const controls = new OrbitControls(camera, cssRenderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 200;
+  controls.maxDistance = 2200;
+  controls.target.set(0, -200, 0);
+  controls.update();
+
+  // connector lines
+  const lineMat = new THREE.LineBasicMaterial({color:0x3f7fd1, transparent:true, opacity:0.6});
+  const lineGroup = new THREE.Group(); scene.add(lineGroup);
+  function addLine(a,b){
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(a.x,a.y,0), new THREE.Vector3(b.x,b.y,0)
+    ]);
+    lineGroup.add(new THREE.Line(geo, lineMat));
+  }
+
+  const colorMap = {blue:['#1f5fa8','#3f7fd1'], green:['#0a7d72','#12a894'], gold:['#c98600','#f2a900'], neutral:['#3a4a63','#5a6d8c']};
+  const cssObjects = [];
+  function colorFor(hint){ return colorMap[hint] || colorMap.neutral; }
+
+  function addNode(n){
+    const [c1,c2] = colorFor(n.color_hint);
+    const div = document.createElement('div');
+    div.className = 'org-node-box';
+    div.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+    div.style.color = '#fff';
+    const personLine = n.staff ? `<span class="sub">${esc(n.staff.full_name)}</span>` : (n.subtitle ? `<span class="sub">${esc(n.subtitle)}</span>` : '');
+    div.innerHTML = `${esc(n.label)}${personLine}`;
+    const obj = new CSS3DObject(div);
+    obj.position.set(n.x, n.y, 0);
+    scene.add(obj);
+    cssObjects.push(obj);
+    div.addEventListener('click', ()=>focusNode(n, obj));
+    if(n.parent_node_id && byId[n.parent_node_id]) addLine(n, byId[n.parent_node_id]);
+    n.children.forEach(addNode);
+  }
+  roots.forEach(addNode);
+
+  function focusNode(n, obj){
+    const targetPos = new THREE.Vector3(n.x, n.y, 0);
+    const camTarget = new THREE.Vector3(n.x, n.y, 420);
+    const startCam = camera.position.clone();
+    const startTarget = controls.target.clone();
+    let t = 0;
+    function animate(){
+      t += 0.035;
+      if(t>1) t=1;
+      camera.position.lerpVectors(startCam, camTarget, t);
+      controls.target.lerpVectors(startTarget, targetPos, t);
+      controls.update();
+      if(t<1) requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  document.getElementById('orgLoading')?.remove();
+
+  let raf;
+  function tick(){
+    controls.update();
+    glRenderer.render(scene, camera);
+    cssRenderer.render(scene, camera);
+    raf = requestAnimationFrame(tick);
+  }
+  tick();
+
+  function onResize(){
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+    glRenderer.setSize(w,h); cssRenderer.setSize(w,h);
+  }
+  window.addEventListener('resize', onResize);
+
+  orgThree = {
+    dispose(){
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      controls.dispose();
+      glRenderer.dispose();
+    }
+  };
+}
+
+/* ============================================================================
+   11. ROUTER
+============================================================================ */
+async function router(){
+  if(state.route==='dashboard') return renderDashboard();
+  if(state.route==='organogram') return renderOrganogram();
+  if(state.route==='audit_log') return renderAuditLog();
+  if(state.route==='settings') return renderSettings();
+  if(ENTITIES[state.route]) return renderEntityPage(state.route);
+  return renderDashboard();
+}
+
+/* ============================================================================
+   12. BOOT
+============================================================================ */
+async function boot(){
+  const {data: {session: s}} = await supabase.auth.getSession();
+  session = s;
+  if(!session){ renderLoginScreen(); return; }
+  const {data: au} = await supabase.from('app_users').select('*').eq('id', session.user.id).single();
+  currentAppUser = au;
+  router();
+}
+
+(function start(){
+  supabase.auth.onAuthStateChange((event, s)=>{ session = s; if(event==='SIGNED_OUT'){ renderLoginScreen(); } });
+  boot();
+})();
+</script>
+</body>
+</html>
