@@ -16,25 +16,31 @@
 </script>
 <style>
   :root{
-    --knosk-navy:#0c2a52;
-    --knosk-blue:#1f5fa8;
-    --knosk-blue-light:#3f7fd1;
-    --knosk-gold:#f2a900;
+    --knosk-navy:#15251c;       /* ink — headings, active pill, buttons, dark cards */
+    --knosk-blue:#2f9e49;       /* primary green accent — fills, rings, highlights */
+    --knosk-blue-light:#5cc96f; /* lighter green — gradient stops, hovers */
+    --knosk-gold:#f2a900;       /* KNOSK gold — logo chip, salary badge, highlights */
     --knosk-gold-light:#ffc94d;
-    --knosk-bg:#f3f6fb;
-    --knosk-line:#e7ecf5;
-    --knosk-text:#1c2f47;
-    --knosk-muted:#64748b;
+    --knosk-bg:#eef8f0;         /* light mint surface fill */
+    --knosk-line:#e6ece7;
+    --knosk-text:#17231b;
+    --knosk-muted:#62766a;
   }
   *{box-sizing:border-box;}
-  body{font-family:'Inter',ui-sans-serif,'Segoe UI',system-ui,sans-serif;background:var(--knosk-bg);color:var(--knosk-text);margin:0;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  body{
+    font-family:'Inter',ui-sans-serif,'Segoe UI',system-ui,sans-serif;
+    background:linear-gradient(150deg,#8fd39a 0%, #4fa25a 45%, #388a49 100%);
+    background-attachment:fixed;
+    color:var(--knosk-text);margin:0;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
   ::-webkit-scrollbar{width:9px;height:9px;}
-  ::-webkit-scrollbar-thumb{background:#c9d4e5;border-radius:8px;}
-  .brand-grad{background:linear-gradient(160deg,var(--knosk-navy) 0%,var(--knosk-blue) 65%,var(--knosk-blue-light) 100%);}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.4);border-radius:8px;}
+  .brand-grad{background:linear-gradient(160deg,var(--knosk-navy) 0%,#1f3b2a 55%,var(--knosk-blue) 130%);}
   .gold-grad{background:linear-gradient(135deg,var(--knosk-gold) 0%,var(--knosk-gold-light) 100%);}
-  .card{background:#fff;border:1px solid var(--knosk-line);border-radius:18px;box-shadow:0 1px 2px rgba(16,38,72,.04), 0 8px 24px -12px rgba(16,38,72,.08);}
+  .green-grad{background:linear-gradient(135deg,var(--knosk-blue) 0%,var(--knosk-blue-light) 100%);}
+  .card{background:#fff;border:1px solid var(--knosk-line);border-radius:18px;box-shadow:0 1px 2px rgba(16,38,72,.04), 0 10px 28px -12px rgba(12,30,20,.16);}
   .btn-primary{background:var(--knosk-navy);color:#fff;border-radius:12px;padding:11px 20px;font-weight:600;font-size:14.5px;transition:.15s;}
-  .btn-primary:hover{background:var(--knosk-blue);}
+  .btn-primary:hover{background:#223a2a;}
   .btn-gold{background:var(--knosk-gold);color:#12253f;border-radius:12px;padding:11px 20px;font-weight:700;font-size:14.5px;transition:.15s;}
   .btn-gold:hover{background:var(--knosk-gold-light);}
   .btn-ghost{background:#fff;color:var(--knosk-navy);border:1px solid var(--knosk-line);border-radius:12px;padding:9px 16px;font-weight:600;font-size:13.5px;transition:.15s;}
@@ -69,6 +75,32 @@
   .status-candidate{background:#f1e9ff;color:#6a3fc4;}
   .status-reassigned{background:#e0f7f5;color:#0a7d72;}
   .stat-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+
+  /* --- capsules & rings (dashboard widgets) --- */
+  .capsule-track{position:relative;height:36px;border-radius:999px;background:#eef2f8;overflow:hidden;}
+  .capsule-fill{height:100%;border-radius:999px;transition:width .3s;}
+  .capsule-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12.5px;font-weight:800;color:#fff;}
+  .ring-badge{border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ring-inner{background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--knosk-line);}
+
+  /* --- accordion (Quick Panels) --- */
+  details.acc{border-bottom:1px solid var(--knosk-line);padding:14px 0;}
+  details.acc:last-child{border-bottom:none;}
+  details.acc summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:14.5px;color:var(--knosk-text);}
+  details.acc summary::-webkit-details-marker{display:none;}
+  details.acc summary:after{content:'⌄';color:#9db0c9;font-size:15px;font-weight:900;transition:transform .2s;margin-left:auto;padding-left:8px;}
+  details.acc[open] summary:after{transform:rotate(180deg);}
+  details.acc .acc-body{padding-top:10px;font-size:13.5px;color:#5b6f8c;line-height:1.5;}
+
+  /* --- top nav bar --- */
+  .topnav-item{padding:10px 17px;border-radius:999px;font-size:14px;font-weight:600;color:#5b6f8c;white-space:nowrap;cursor:pointer;transition:.15s;flex-shrink:0;}
+  .topnav-item:hover{background:#eef3fb;color:var(--knosk-navy);}
+  .topnav-item.active{background:var(--knosk-navy);color:#fff;box-shadow:0 4px 12px -4px rgba(12,42,82,.5);}
+  .icon-btn{width:42px;height:42px;border-radius:50%;background:#f3f6fb;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:1px solid var(--knosk-line);transition:.15s;position:relative;flex-shrink:0;}
+  .icon-btn:hover{background:#eef3fb;}
+  #alertBadge{position:absolute;top:-3px;right:-3px;background:#e0483e;color:#fff;font-size:10px;font-weight:800;min-width:17px;height:17px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid #fff;}
+  .avatar-circle{width:42px;height:42px;border-radius:50%;background:var(--knosk-navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;cursor:pointer;flex-shrink:0;border:none;}
+
   #orgCanvasWrap{position:relative;width:100%;height:72vh;border-radius:18px;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #12335e 0%, #0a1f3d 70%, #071730 100%);}
   .org-node-box{pointer-events:auto;cursor:pointer;user-select:none;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.25);white-space:nowrap;transition:transform .15s;}
   .org-node-box:hover{transform:scale(1.06);}
@@ -162,6 +194,7 @@ const ENTITIES = {
     select:'*, department:department_id(name), reports_to:reports_to_staff_id(full_name)',
     order:{col:'full_name', asc:true},
     columns:[
+      {key:'photo_url', label:'', render:v=>avatarCell(v)},
       {key:'full_name', label:'Name'},
       {key:'job_title', label:'Title'},
       {key:'track', label:'Track', render:v=>trackBadge(v)},
@@ -170,6 +203,7 @@ const ENTITIES = {
       {key:'start_date', label:'Start Date'},
     ],
     fields:[
+      {key:'photo_url', label:'Profile Photo', type:'file', bucket:'avatars', accept:'image/*'},
       {key:'full_name', label:'Full Name', type:'text', required:true},
       {key:'personal_email', label:'Personal Email', type:'email'},
       {key:'personal_phone', label:'Personal Phone', type:'text'},
@@ -275,7 +309,7 @@ const ENTITIES = {
       {key:'doc_type', label:'Document Type', type:'select', options:DOC_TYPES.map(t=>({value:t,label:t})), required:true},
       {key:'title', label:'Title / Description', type:'text'},
       {key:'status', label:'Status', type:'select', options:DOC_STATUSES.map(t=>({value:t,label:t}))},
-      {key:'file_url', label:'File URL', type:'text'},
+      {key:'file_url', label:'Document File', type:'file', bucket:'documents', accept:'.pdf,.doc,.docx,.jpg,.jpeg,.png'},
       {key:'issued_date', label:'Issued Date', type:'date'},
       {key:'expiry_date', label:'Expiry Date', type:'date'},
       {key:'notes', label:'Notes', type:'textarea'},
@@ -403,6 +437,19 @@ const ENTITIES = {
    3. RENDER HELPERS
 ============================================================================ */
 function trackBadge(v){ if(!v) return '—'; return `<span class="badge pill-track-${v}">${v.toUpperCase()}</span>`; }
+function avatarCell(url, row){
+  const label = (row?.full_name||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  if(url) return `<img src="${esc(url)}" class="w-9 h-9 rounded-full object-cover border border-slate-200" alt="">`;
+  return `<div class="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white green-grad">${label}</div>`;
+}
+async function uploadFile(bucket, file){
+  const ext = file.name.split('.').pop();
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const {error} = await supabase.storage.from(bucket).upload(path, file, {upsert:true});
+  if(error) throw error;
+  const {data} = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
 function statusBadge(v){ if(!v) return '—'; return `<span class="badge status-${v}">${v}</span>`; }
 function docStatusBadge(v){
   const map={missing:'sev-critical', pending:'sev-warning', on_file:'status-active', expired:'sev-critical'};
@@ -426,38 +473,38 @@ const app = document.getElementById('app');
 
 function renderShell(innerHtml){
   app.innerHTML = `
-  <div class="flex min-h-screen">
-    <aside class="w-72 brand-grad flex-shrink-0 hidden md:flex flex-col py-7 px-5">
-      <div class="flex items-center gap-3 px-2 mb-9">
-        <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center font-black text-xl" style="color:var(--knosk-navy)">K</div>
-        <div>
-          <div class="text-white font-extrabold text-lg leading-none">KNOSK</div>
-          <div class="text-xs text-blue-200 font-semibold tracking-wide mt-1">HR SYSTEM</div>
+  <div class="min-h-screen">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6">
+      <div class="card !rounded-full flex items-center gap-2 px-3 py-2.5 mb-8">
+        <div class="flex items-center gap-2.5 pl-1 pr-2 flex-shrink-0">
+          <div class="w-9 h-9 rounded-full gold-grad flex items-center justify-center font-black text-sm" style="color:var(--knosk-navy)">K</div>
+          <span class="font-extrabold hidden sm:inline text-[15px]" style="color:var(--knosk-navy)">KNOSK</span>
+        </div>
+        <nav class="flex-1 flex items-center gap-1 overflow-x-auto tab-scroll">
+          ${NAV.map(n=>`<div class="topnav-item ${state.route===n.key?'active':''}" data-route="${n.key}">${n.label}</div>`).join('')}
+        </nav>
+        <div class="flex items-center gap-2 flex-shrink-0 pl-1">
+          <button id="settingsIcon" class="icon-btn" title="Settings">⚙️</button>
+          <button id="alertsIcon" class="icon-btn" title="Alerts"><span id="alertBadge" class="hidden"></span>🔔</button>
+          <button id="avatarBtn" class="avatar-circle" title="Sign out">${initials(currentAppUser?.full_name||session?.user?.email)}</button>
         </div>
       </div>
-      <nav class="flex-1 space-y-1.5 overflow-y-auto tab-scroll">
-        ${NAV.map(n=>`<div class="nav-item ${state.route===n.key?'active':''}" data-route="${n.key}"><span class="ic">${n.icon}</span><span>${n.label}</span></div>`).join('')}
-      </nav>
-      <div class="pt-5 border-t border-white/15 mt-5">
-        <div class="text-blue-100 text-sm px-2 mb-3 font-medium">${currentAppUser?.full_name||session?.user?.email||''}<br><span class="uppercase text-[11px] tracking-wide text-blue-300 font-bold">${currentAppUser?.role||''}</span></div>
-        <button id="signOutBtn" class="nav-item w-full"><span class="ic">🚪</span><span>Sign Out</span></button>
-      </div>
-    </aside>
-    <div class="flex-1 flex flex-col min-w-0">
-      <header class="md:hidden brand-grad px-4 py-3 flex items-center justify-between">
-        <div class="text-white font-bold text-lg">KNOSK HR</div>
-        <select id="mobileNav" class="!w-auto text-sm">
-          ${NAV.map(n=>`<option value="${n.key}" ${state.route===n.key?'selected':''}>${n.icon} ${n.label}</option>`).join('')}
-        </select>
-      </header>
-      <main class="flex-1 p-5 md:p-10 overflow-x-hidden">
+      <main class="pb-16">
         ${innerHtml}
       </main>
     </div>
   </div>`;
   document.querySelectorAll('[data-route]').forEach(el=>el.addEventListener('click', ()=>{ state.route = el.dataset.route; router(); }));
-  document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.reload(); });
-  document.getElementById('mobileNav')?.addEventListener('change', e=>{ state.route = e.target.value; router(); });
+  document.getElementById('settingsIcon')?.addEventListener('click', ()=>{ state.route='settings'; router(); });
+  document.getElementById('alertsIcon')?.addEventListener('click', ()=>{ state.route='alerts'; router(); });
+  document.getElementById('avatarBtn')?.addEventListener('click', async ()=>{ if(confirm('Sign out of KNOSK HR?')){ await supabase.auth.signOut(); location.reload(); } });
+  loadAlertBadge();
+}
+
+async function loadAlertBadge(){
+  const {count} = await supabase.from('alerts').select('id', {count:'exact', head:true}).eq('resolved', false);
+  const badge = document.getElementById('alertBadge');
+  if(badge && count){ badge.textContent = count>9?'9+':count; badge.classList.remove('hidden'); }
 }
 
 function pageHeader(title, subtitle, actionHtml=''){
@@ -539,7 +586,7 @@ async function loadEntityTable(entityKey){
   if(!data || data.length===0){ tbody.innerHTML = `<tr><td colspan="99" class="text-center py-8 text-slate-400">No records yet. Click "Add" to create one.</td></tr>`; return; }
   tbody.innerHTML = data.map(row=>`
     <tr>
-      ${cfg.columns.map(c=>`<td>${c.render ? c.render(row[c.key]) : esc(row[c.key] ?? '—')}</td>`).join('')}
+      ${cfg.columns.map(c=>`<td>${c.render ? c.render(row[c.key], row) : esc(row[c.key] ?? '—')}</td>`).join('')}
       <td class="text-right whitespace-nowrap">
         <button class="btn-ghost text-xs mr-1" data-edit="${row[cfg.pk]}">Edit</button>
         <button class="btn-ghost text-xs text-red-600" data-del="${row[cfg.pk]}">Delete</button>
@@ -585,6 +632,21 @@ async function openEntityForm(entityKey, id=null){
     </div>`;
   document.body.appendChild(backdrop);
   const close = ()=>backdrop.remove();
+  backdrop.querySelectorAll('[data-upload-for]').forEach(inp=>{
+    inp.addEventListener('change', async ()=>{
+      const file = inp.files[0]; if(!file) return;
+      const key = inp.dataset.uploadFor, bucket = inp.dataset.bucket;
+      const status = document.getElementById('uploadStatus_'+key);
+      const preview = document.getElementById('preview_'+key);
+      status.textContent = 'Uploading…';
+      try{
+        const url = await uploadFile(bucket, file);
+        document.getElementById('f_'+key).value = url;
+        preview.innerHTML = file.type.startsWith('image/') ? `<img src="${url}" class="w-full h-full object-cover">` : '📄 On file';
+        status.textContent = 'Uploaded ✓';
+      }catch(err){ status.textContent = 'Upload failed: '+err.message; }
+    });
+  });
   backdrop.querySelector('#closeModal').addEventListener('click', close);
   backdrop.querySelector('#cancelBtn').addEventListener('click', close);
   backdrop.addEventListener('click', e=>{ if(e.target===backdrop) close(); });
@@ -610,7 +672,7 @@ async function openEntityForm(entityKey, id=null){
 
 function renderField(f, value, options){
   const val = value ?? '';
-  const wrapWide = (f.type==='textarea') ? 'sm:col-span-2' : '';
+  const wrapWide = (f.type==='textarea' || f.type==='file') ? 'sm:col-span-2' : '';
   let input = '';
   if(f.type==='select'){
     const opts = f.options || options || [];
@@ -619,6 +681,19 @@ function renderField(f, value, options){
     input = `<textarea id="f_${f.key}" rows="3">${esc(val)}</textarea>`;
   } else if(f.type==='checkbox'){
     return `<div class="flex items-center gap-2 pt-5"><input type="checkbox" id="f_${f.key}" ${val?'checked':''} class="w-4 h-4"><label for="f_${f.key}" class="text-sm font-medium">${f.label}</label></div>`;
+  } else if(f.type==='file'){
+    const isImg = f.accept && f.accept.includes('image');
+    return `<div class="${wrapWide}">
+      <label class="field-label">${f.label}</label>
+      <div class="flex items-center gap-3">
+        <div id="preview_${f.key}" class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center text-slate-400 text-[10px] flex-shrink-0 border border-slate-200 text-center">${val ? (isImg?`<img src="${esc(val)}" class="w-full h-full object-cover">`:'📄 On file') : 'No file'}</div>
+        <div class="flex-1 min-w-0">
+          <input type="file" data-upload-for="${f.key}" data-bucket="${f.bucket}" accept="${f.accept||'*/*'}" class="text-xs">
+          <div id="uploadStatus_${f.key}" class="text-xs text-slate-400 mt-1.5">${val?'File on record — choose a new one to replace it.':'Upload a file, or leave blank.'}</div>
+        </div>
+      </div>
+      <input type="hidden" id="f_${f.key}" value="${esc(val)}">
+    </div>`;
   } else {
     input = `<input type="${f.type}" id="f_${f.key}" value="${esc(val)}" ${f.required?'required':''}>`;
   }
@@ -628,76 +703,283 @@ function renderField(f, value, options){
 /* ============================================================================
    7. DASHBOARD
 ============================================================================ */
-async function renderDashboard(){
-  renderShell(`<div id="pageRoot">${pageHeader('Dashboard', 'Leadership view of the state of KNOSK\'s people, right now.')}
-  <div id="statGrid" class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8"></div>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 card p-6">
-      <h3 class="font-bold text-lg mb-4">Open Alerts &amp; Flags</h3>
-      <div id="alertList" class="space-y-3"></div>
-    </div>
-    <div class="card p-6">
-      <h3 class="font-bold text-lg mb-4">Staff by Track</h3>
-      <div id="trackChart" class="space-y-4"></div>
-      <h3 class="font-bold text-lg mt-8 mb-4">Staff by Status</h3>
-      <div id="statusChart" class="space-y-3"></div>
-    </div>
-  </div></div>`);
+function initials(name){
+  if(!name) return '?';
+  return name.trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+}
+function clamp(n,lo,hi){ return Math.max(lo, Math.min(hi, n)); }
+function daysBetween(a,b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
+function fmtShort(d){ if(!d) return '—'; return new Date(d).toLocaleDateString(undefined,{month:'short', day:'numeric'}); }
 
-  const [{data: staffAll}, {data: alertsOpen}, {data: offOpen}, {data: onOpen}] = await Promise.all([
-    supabase.from('staff').select('id, track, status'),
+function ringHtml(pct, size=88, color='var(--knosk-navy)', label=''){
+  pct = clamp(Math.round(pct||0), 0, 100);
+  return `<div class="ring-badge" style="width:${size}px;height:${size}px;background:conic-gradient(${color} ${pct*3.6}deg, #eef2f8 0deg);">
+    <div class="ring-inner" style="width:${size-14}px;height:${size-14}px;">
+      <div style="font-size:${size*0.2}px;font-weight:800;color:var(--knosk-navy);line-height:1;">${pct}%</div>
+      ${label?`<div style="font-size:${size*0.09}px;color:#8598b3;font-weight:600;margin-top:2px;">${label}</div>`:''}
+    </div>
+  </div>`;
+}
+function capsuleHtml(label, pct, color, width=130){
+  pct = clamp(Math.round(pct||0), 0, 100);
+  return `<div>
+    <div class="text-xs font-semibold text-slate-500 mb-1.5">${label}</div>
+    <div class="capsule-track" style="width:${width}px"><div class="capsule-fill" style="width:${Math.max(pct,14)}%;background:${color}"></div><span class="capsule-label">${pct}%</span></div>
+  </div>`;
+}
+function bigStatHtml(icon, value, label){
+  return `<div class="flex items-center gap-2.5">
+    <span class="text-xl">${icon}</span>
+    <div><div class="text-2xl font-extrabold leading-none" style="color:var(--knosk-navy)">${value}</div><div class="text-xs text-slate-500 font-semibold mt-0.5">${label}</div></div>
+  </div>`;
+}
+
+async function renderDashboard(){
+  renderShell(`<div id="pageRoot">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold tracking-tight" style="color:var(--knosk-navy)">Welcome in, ${esc((currentAppUser?.full_name||'').split(' ')[0]||'')}</h1>
+      <p class="text-[15px] text-slate-500 mt-1">Here's where KNOSK's people stand today.</p>
+    </div>
+
+    <div class="card p-6 mb-6 flex flex-wrap items-center justify-between gap-6">
+      <div id="capsuleRow" class="flex flex-wrap items-center gap-7"></div>
+      <div id="bigStatsRow" class="flex flex-wrap items-center gap-8"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+      <div id="spotlightCard" class="card overflow-hidden relative" style="min-height:260px;"></div>
+      <div id="deptCard" class="card p-5"></div>
+      <div id="probationCard" class="card p-5 flex flex-col items-center text-center justify-center"></div>
+      <div id="onboardCard" class="card p-5"></div>
+    </div>
+
+    <div id="checklistCard" class="card p-6 mb-6" style="background:var(--knosk-navy);border:none;"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="card p-6" id="accordionCard"><h3 class="font-bold text-lg mb-2">Quick Panels</h3></div>
+      <div class="card p-6" id="keyDatesCard"><h3 class="font-bold text-lg mb-4">Key Dates — Next 14 Days</h3></div>
+      <div class="card p-6" id="alertsCard"><h3 class="font-bold text-lg mb-4">Open Alerts &amp; Flags</h3></div>
+    </div>
+  </div>`);
+
+  const today = new Date();
+  const [
+    {data: staffAll},
+    {data: alertsOpen},
+    {data: offOpen},
+    {data: onboardOpen},
+    {data: spotlight},
+    {data: onProbation},
+    {data: accessActive, count: accessCount},
+    {data: docsPending, count: docsCount},
+    {data: deptsNoJd, count: deptsNoJdCount},
+    {data: offboardingDates},
+  ] = await Promise.all([
+    supabase.from('staff').select('id, track, status, department_id, department:department_id(name)'),
     supabase.from('alerts').select('*, staff:staff_id(full_name)').eq('resolved', false).order('severity',{ascending:false}).limit(20),
-    supabase.from('offboarding_cases').select('id').neq('status','closed'),
-    supabase.from('onboarding_cases').select('id').neq('stage','complete'),
+    supabase.from('offboarding_cases').select('id, last_working_day, staff:staff_id(full_name)').neq('status','closed'),
+    supabase.from('onboarding_cases').select('*, staff:staff_id(full_name)').neq('stage','complete').order('started_at',{ascending:true}),
+    supabase.from('staff').select('*').eq('status','active').order('created_at',{ascending:false}).limit(1).maybeSingle(),
+    supabase.from('staff').select('full_name, start_date, probation_end_date').eq('status','probation').not('probation_end_date','is',null).order('probation_end_date',{ascending:true}).limit(1).maybeSingle(),
+    supabase.from('access_items').select('id', {count:'exact'}).eq('status','active'),
+    supabase.from('documents').select('id', {count:'exact'}).in('status', ['missing','pending']),
+    supabase.from('departments').select('id', {count:'exact'}).eq('jd_on_file', false),
+    supabase.from('offboarding_cases').select('last_working_day, staff:staff_id(full_name)').neq('status','closed').not('last_working_day','is',null),
   ]);
 
   const total = staffAll?.length || 0;
   const active = staffAll?.filter(s=>s.status==='active').length || 0;
-  const stats = [
-    {label:'Total Staff', value:total, icon:'🧑‍💼', bg:'#e7f0ff', color:'#1f5fa8'},
-    {label:'Active', value:active, icon:'✅', bg:'#e3f8ea', color:'#1a7f43'},
-    {label:'Open Onboarding', value:onOpen?.length||0, icon:'🚪', bg:'#fff3d6', color:'#a06b00'},
-    {label:'Open Offboarding', value:offOpen?.length||0, icon:'🏁', bg:'#fde3e3', color:'#b3261e'},
-  ];
-  document.getElementById('statGrid').innerHTML = stats.map(s=>`
-    <div class="card p-6">
-      <div class="stat-icon mb-4" style="background:${s.bg};color:${s.color}">${s.icon}</div>
-      <div class="text-3xl font-extrabold" style="color:var(--knosk-navy)">${s.value}</div>
-      <div class="text-[13.5px] text-slate-500 font-semibold mt-1">${s.label}</div>
-    </div>`).join('');
+  const probationCt = staffAll?.filter(s=>s.status==='probation').length || 0;
 
-  const alertList = document.getElementById('alertList');
-  if(!alertsOpen || alertsOpen.length===0){ alertList.innerHTML = `<div class="text-sm text-slate-400 py-6 text-center">No open alerts. All clear.</div>`; }
-  else {
-    alertList.innerHTML = alertsOpen.map(a=>`
-      <div class="flex items-start justify-between gap-3 p-4 rounded-2xl border border-slate-100 bg-slate-50">
-        <div>
-          <div class="flex items-center gap-2 mb-1.5"><span class="badge sev-${a.severity}">${a.severity}</span><span class="text-[13px] text-slate-400 font-medium">${a.alert_type}</span></div>
-          <div class="text-[14.5px] font-semibold">${esc(a.message)}</div>
-          <div class="text-[13px] text-slate-400 mt-1">${a.staff?.full_name || ''}</div>
-        </div>
-        <button class="btn-ghost text-xs flex-shrink-0" data-resolve="${a.id}">Resolve</button>
-      </div>`).join('');
-    alertList.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click', async ()=>{
-      await supabase.from('alerts').update({resolved:true, resolved_at:new Date().toISOString()}).eq('id', b.dataset.resolve);
-      renderDashboard();
-    }));
+  /* --- capsule row + big stats --- */
+  document.getElementById('capsuleRow').innerHTML =
+    capsuleHtml('Active', total?Math.round(active/total*100):0, 'var(--knosk-navy)') +
+    capsuleHtml('Probation', total?Math.round(probationCt/total*100):0, 'var(--knosk-blue)') +
+    capsuleHtml('Onboarding', total?Math.round((onboardOpen?.length||0)/Math.max(total,1)*100):0, 'var(--knosk-gold)');
+  document.getElementById('bigStatsRow').innerHTML =
+    bigStatHtml('🧑‍💼', total, 'Total Staff') +
+    bigStatHtml('🚪', onboardOpen?.length||0, 'Onboarding') +
+    bigStatHtml('🏁', offOpen?.length||0, 'Offboarding');
+
+  /* --- spotlight staff card --- */
+  const sp = spotlight;
+  document.getElementById('spotlightCard').innerHTML = sp ? `
+    ${sp.photo_url
+      ? `<img src="${esc(sp.photo_url)}" class="absolute inset-0 w-full h-full object-cover">`
+      : `<div class="absolute inset-0 brand-grad"></div>
+         <div class="absolute inset-0 flex items-center justify-center">
+           <div class="w-24 h-24 rounded-full flex items-center justify-center text-white font-black text-3xl border-4" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);">${initials(sp.full_name)}</div>
+         </div>`}
+    <div class="absolute top-4 right-4 badge" style="background:rgba(255,255,255,.85);color:var(--knosk-navy);">${(sp.track||'').toUpperCase()}</div>
+    <div class="absolute bottom-0 left-0 right-0 p-5" style="background:linear-gradient(to top, rgba(4,14,10,.85), transparent);">
+      <div class="text-white font-extrabold text-lg leading-tight">${esc(sp.full_name)}</div>
+      <div class="text-green-100 text-sm mb-3" style="color:#d7f2da;">${esc(sp.job_title||'')}</div>
+      <span class="badge" style="background:var(--knosk-gold);color:#12253f;">${sp.monthly_salary? '₦'+Number(sp.monthly_salary).toLocaleString() : 'Salary not set'}</span>
+    </div>` :
+    `<div class="h-full w-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">No active staff yet — add someone in the Staff Registry.</div>`;
+
+  /* --- department bar chart card --- */
+  const deptCounts = {};
+  (staffAll||[]).forEach(s=>{ const name = s.department?.name || 'Unassigned'; deptCounts[name] = (deptCounts[name]||0)+1; });
+  const deptEntries = Object.entries(deptCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxCount = Math.max(1, ...deptEntries.map(e=>e[1]));
+  const topIdx = deptEntries.findIndex(([,c])=>c===maxCount);
+  document.getElementById('deptCard').innerHTML = `
+    <div class="flex items-center justify-between mb-1"><h3 class="font-bold">Departments</h3><span class="text-slate-300">↗</span></div>
+    <div class="text-2xl font-extrabold" style="color:var(--knosk-navy)">${Object.keys(deptCounts).length}<span class="text-xs font-semibold text-slate-400 ml-1">groups staffed</span></div>
+    <div class="flex items-end gap-2.5 h-24 mt-6 relative">
+      ${deptEntries.length? deptEntries.map(([name,c],i)=>`<div class="flex-1 flex flex-col items-center justify-end h-full relative">
+          ${i===topIdx?`<span class="badge absolute -top-7" style="background:var(--knosk-navy);color:#fff;font-size:10.5px;padding:3px 9px;">${c}</span>`:''}
+          <div class="w-full rounded-full transition-all" style="height:${Math.max(10, c/maxCount*80)}px;background:${i===topIdx?'var(--knosk-blue)':'#e3ece5'}"></div>
+        </div>`).join('') : `<div class="text-xs text-slate-400 self-center mx-auto">No department data yet.</div>`}
+    </div>
+    <div class="flex gap-2.5 mt-2 text-[10px] text-slate-400 font-medium">
+      ${deptEntries.map(([name])=>`<span class="flex-1 text-center truncate" title="${esc(name)}">${esc(name.split(' ')[0])}</span>`).join('')}
+    </div>`;
+
+  /* --- probation ring card --- */
+  let probPct = 0, probLabel = 'No one on probation';
+  if(onProbation && onProbation.start_date && onProbation.probation_end_date){
+    const span = daysBetween(onProbation.start_date, onProbation.probation_end_date) || 90;
+    const elapsed = daysBetween(onProbation.start_date, today.toISOString());
+    probPct = clamp(elapsed/span*100, 0, 100);
+    const daysLeft = daysBetween(today.toISOString(), onProbation.probation_end_date);
+    probLabel = `${esc(onProbation.full_name)} — ${daysLeft>=0?daysLeft+'d left':'review overdue'}`;
+  }
+  document.getElementById('probationCard').innerHTML = `
+    <h3 class="font-bold self-start mb-3 w-full text-left">Probation Watch</h3>
+    ${ringHtml(probPct, 100, 'var(--knosk-blue)')}
+    <div class="mt-3 text-sm font-semibold">${probLabel}</div>`;
+
+  /* --- onboarding donut card --- */
+  const onboardTotal = onboardOpen?.length || 0;
+  const gatesPassed = (onboardOpen||[]).filter(c=>c.gate_passed).length;
+  const profileOnly = (onboardOpen||[]).filter(c=>!c.gate_passed && c.staff_profile_activated).length;
+  const earlyStage = onboardTotal - gatesPassed - profileOnly;
+  const onboardPct = onboardTotal? Math.round(gatesPassed/onboardTotal*100) : 0;
+  const pct = n => onboardTotal? Math.round(n/onboardTotal*100) : 0;
+  document.getElementById('onboardCard').innerHTML = `
+    <div class="flex items-center justify-between mb-3"><h3 class="font-bold">Onboarding</h3><span class="font-extrabold" style="color:var(--knosk-navy)">${onboardPct}%</span></div>
+    ${onboardTotal ? `
+    <div class="flex h-9 rounded-full overflow-hidden w-full mb-2.5">
+      <div style="width:${Math.max(pct(gatesPassed),gatesPassed?4:0)}%;background:var(--knosk-blue)"></div>
+      <div style="width:${Math.max(pct(profileOnly),profileOnly?4:0)}%;background:var(--knosk-navy)"></div>
+      <div style="width:${Math.max(pct(earlyStage),earlyStage?4:0)}%;background:#e3ece5"></div>
+    </div>
+    <div class="flex justify-between text-[10px] text-slate-400 font-semibold mb-3">
+      <span>${pct(gatesPassed)}% Gate Passed</span><span>${pct(profileOnly)}% Profile Active</span><span>${pct(earlyStage)}% Early</span>
+    </div>` : `<div class="capsule-track mb-4" style="width:100%"><div class="capsule-fill" style="width:6%;background:#e3ece5"></div></div>`}
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${onboardTotal}</div><div class="text-[10.5px] text-slate-400 font-medium">Open</div></div>
+      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${gatesPassed}</div><div class="text-[10.5px] text-slate-400 font-medium">Gate Passed</div></div>
+      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${Math.max(earlyStage+profileOnly,0)}</div><div class="text-[10.5px] text-slate-400 font-medium">In Progress</div></div>
+    </div>`;
+
+  /* --- dark onboarding checklist card --- */
+  const showcase = onboardOpen && onboardOpen[0];
+  if(showcase){
+    const {data: tasks} = await supabase.from('onboarding_tasks').select('*').eq('onboarding_case_id', showcase.id).order('sort_order');
+    const done = (tasks||[]).filter(t=>t.completed).length;
+    document.getElementById('checklistCard').innerHTML = `
+      <div class="flex items-center justify-between mb-5">
+        <div><h3 class="font-bold text-white text-lg">Onboarding — ${esc(showcase.staff?.full_name||'Unnamed')}</h3><p class="text-blue-200 text-xs mt-0.5">Stage: ${esc(showcase.stage)}</p></div>
+        <span class="badge" style="background:rgba(255,255,255,.14);color:#fff;">${done}/${(tasks||[]).length}</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+        ${(tasks&&tasks.length) ? tasks.map(t=>`
+          <div class="flex items-center justify-between p-3.5 rounded-xl" style="background:rgba(255,255,255,.07);">
+            <div class="pr-3"><div class="text-sm font-semibold text-white">${esc(t.task_name)}</div>${t.week_label?`<div class="text-[11px] text-blue-200 mt-0.5">${esc(t.week_label)}</div>`:''}</div>
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:${t.completed?'var(--knosk-gold)':'rgba(255,255,255,.15)'};color:${t.completed?'#12253f':'#fff'}">${t.completed?'✓':''}</span>
+          </div>`).join('') : `<div class="text-blue-200 text-sm md:col-span-2">No tasks logged yet for this case — add Week 1/2 tasks from the Onboarding tab.</div>`}
+      </div>`;
+  } else {
+    document.getElementById('checklistCard').innerHTML = `<div class="text-white/80 text-sm">No open onboarding cases right now — all clear.</div>`;
   }
 
-  const byTrack = {ngo:0, school:0};
-  (staffAll||[]).forEach(s=>{ if(s.track) byTrack[s.track] = (byTrack[s.track]||0)+1; });
-  document.getElementById('trackChart').innerHTML = Object.entries(byTrack).map(([k,v])=>barRow(k.toUpperCase(), v, total, k==='ngo'?'var(--knosk-blue)':'var(--knosk-gold)')).join('');
+  /* --- accordion quick panels --- */
+  document.getElementById('accordionCard').innerHTML += `
+    <details class="acc" open>
+      <summary>Access Inventory <span class="text-slate-400 font-semibold">${accessCount??0} active</span></summary>
+      <div class="acc-body">Live grants across WhatsApp groups, drives, and platform logins. Review before every offboarding case closes.</div>
+    </details>
+    <details class="acc">
+      <summary>Documents <span class="text-slate-400 font-semibold">${docsCount??0} pending/missing</span></summary>
+      <div class="acc-body">Offer letters, IDs, and safeguarding declarations still awaiting upload or sign-off.</div>
+    </details>
+    <details class="acc">
+      <summary>Departments <span class="text-slate-400 font-semibold">${deptsNoJdCount??0} without JD</span></summary>
+      <div class="acc-body">Every offer letter depends on an approved JD existing first — these departments need one written.</div>
+    </details>
+    <details class="acc">
+      <summary>Open Offboarding <span class="text-slate-400 font-semibold">${offOpen?.length??0} cases</span></summary>
+      <div class="acc-body">Handover, equipment return, and access revocation must all clear before a case can close.</div>
+    </details>`;
 
-  const byStatus = {};
-  (staffAll||[]).forEach(s=>{ byStatus[s.status] = (byStatus[s.status]||0)+1; });
-  document.getElementById('statusChart').innerHTML = Object.entries(byStatus).map(([k,v])=>barRow(k, v, total, 'var(--knosk-navy)')).join('');
-}
-function barRow(label, value, total, color){
-  const pct = total? Math.round((value/total)*100) : 0;
-  return `<div>
-    <div class="flex justify-between text-[13.5px] mb-1.5"><span class="font-semibold capitalize">${label}</span><span class="text-slate-400 font-medium">${value}</span></div>
-    <div class="w-full h-2.5 rounded-full bg-slate-100"><div class="h-2.5 rounded-full" style="width:${pct}%;background:${color}"></div></div>
+  /* --- key dates --- */
+  const events = [];
+  const {data: staffDates} = await supabase.from('staff').select('full_name, probation_end_date, guarantor_requested_date, guarantor_received_date');
+  (staffDates||[]).forEach(s=>{
+    if(s.probation_end_date){
+      const d = daysBetween(today.toISOString(), s.probation_end_date);
+      if(d>=0 && d<=14) events.push({date:s.probation_end_date, label:`${s.full_name} — probation ends`, type:'probation'});
+    }
+    if(s.guarantor_requested_date && !s.guarantor_received_date){
+      const deadline = new Date(s.guarantor_requested_date); deadline.setDate(deadline.getDate()+30);
+      const d = daysBetween(today.toISOString(), deadline.toISOString());
+      if(d>=0 && d<=14) events.push({date:deadline.toISOString(), label:`${s.full_name} — guarantor letter due`, type:'guarantor'});
+    }
+  });
+  (offboardingDates||[]).forEach(o=>{
+    if(o.last_working_day){
+      const d = daysBetween(today.toISOString(), o.last_working_day);
+      if(d>=0 && d<=14) events.push({date:o.last_working_day, label:`${o.staff?.full_name||'Staff'} — last working day`, type:'offboarding'});
+    }
+  });
+  events.sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const typeColor = {probation:'sev-info', guarantor:'sev-warning', offboarding:'sev-critical'};
+  const typeDot = {probation:'#1f5fa8', guarantor:'#a06b00', offboarding:'#b3261e'};
+
+  // 7-day strip starting today
+  const weekDays = Array.from({length:7}, (_,i)=>{ const d=new Date(today); d.setDate(d.getDate()+i); return d; });
+  const stripHtml = `<div class="grid grid-cols-7 gap-1.5 mb-5">
+    ${weekDays.map((d,i)=>{
+      const dayEvents = events.filter(e=> new Date(e.date).toDateString() === d.toDateString());
+      return `<div class="text-center rounded-2xl py-3 ${i===0?'green-grad text-white':'bg-slate-50'}">
+        <div class="text-[10px] font-bold uppercase ${i===0?'text-white/80':'text-slate-400'}">${d.toLocaleDateString(undefined,{weekday:'short'})}</div>
+        <div class="text-lg font-extrabold mt-0.5 ${i===0?'text-white':''}" style="${i===0?'':'color:var(--knosk-navy)'}">${d.getDate()}</div>
+        <div class="flex items-center justify-center gap-0.5 mt-1.5 h-2">${dayEvents.slice(0,3).map(e=>`<span class="w-1.5 h-1.5 rounded-full" style="background:${i===0?'#fff':typeDot[e.type]}"></span>`).join('')}</div>
+      </div>`;
+    }).join('')}
   </div>`;
+
+  const listHtml = events.length ? events.slice(0,6).map(e=>`
+    <div class="flex items-center gap-3 py-2.5 border-b border-slate-100 last:border-0">
+      <div class="text-center flex-shrink-0" style="width:44px;">
+        <div class="text-[10px] font-bold text-slate-400 uppercase">${new Date(e.date).toLocaleDateString(undefined,{month:'short'})}</div>
+        <div class="text-lg font-extrabold" style="color:var(--knosk-navy)">${new Date(e.date).getDate()}</div>
+      </div>
+      <div class="flex-1 min-w-0"><div class="text-[13.5px] font-semibold truncate">${esc(e.label)}</div></div>
+      <span class="badge ${typeColor[e.type]}">${e.type}</span>
+    </div>`).join('') : `<div class="text-sm text-slate-400 py-4 text-center">Nothing due in the next 14 days.</div>`;
+
+  document.getElementById('keyDatesCard').innerHTML += stripHtml + listHtml;
+
+  /* --- alerts card --- */
+  document.getElementById('alertsCard').innerHTML += !alertsOpen || alertsOpen.length===0
+    ? `<div class="text-sm text-slate-400 py-6 text-center">No open alerts. All clear.</div>`
+    : `<div class="space-y-3">${alertsOpen.slice(0,6).map(a=>`
+        <div class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border border-slate-100 bg-slate-50">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-1"><span class="badge sev-${a.severity}">${a.severity}</span></div>
+            <div class="text-[13.5px] font-semibold truncate">${esc(a.message)}</div>
+            <div class="text-[12px] text-slate-400 mt-0.5">${esc(a.staff?.full_name||'')}</div>
+          </div>
+          <button class="btn-ghost text-xs flex-shrink-0" data-resolve="${a.id}">Resolve</button>
+        </div>`).join('')}</div>`;
+  document.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click', async ()=>{
+    await supabase.from('alerts').update({resolved:true, resolved_at:new Date().toISOString()}).eq('id', b.dataset.resolve);
+    renderDashboard();
+  }));
 }
 
 /* ============================================================================
