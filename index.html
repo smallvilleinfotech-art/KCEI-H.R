@@ -39,6 +39,7 @@
   .gold-grad{background:linear-gradient(135deg,var(--knosk-gold) 0%,var(--knosk-gold-light) 100%);}
   .green-grad{background:linear-gradient(135deg,var(--knosk-blue) 0%,var(--knosk-blue-light) 100%);} /* kept name for compatibility, now blue */
   .text-outline{text-shadow:0 1px 3px rgba(0,0,0,.65), 0 0 10px rgba(0,0,0,.35), 0 2px 1px rgba(0,0,0,.4);}
+  .photo-top{object-fit:cover;object-position:top center;}
   .card{background:#fff;border:1px solid var(--knosk-line);border-radius:18px;box-shadow:0 1px 2px rgba(16,38,72,.05), 0 10px 28px -12px rgba(12,30,60,.14);}
   .btn-primary{background:var(--knosk-navy);color:#fff;border-radius:12px;padding:11px 20px;font-weight:600;font-size:14.5px;transition:.15s;}
   .btn-primary:hover{background:var(--knosk-blue);}
@@ -443,7 +444,7 @@ const ENTITIES = {
 function trackBadge(v){ if(!v) return '—'; return `<span class="badge pill-track-${v}">${v.toUpperCase()}</span>`; }
 function avatarCell(url, row){
   const label = (row?.full_name||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
-  if(url) return `<img src="${esc(url)}" class="w-9 h-9 rounded-full object-cover border border-slate-200" alt="">`;
+  if(url) return `<img src="${esc(url)}" class="w-9 h-9 rounded-full photo-top border border-slate-200" alt="">`;
   return `<div class="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white green-grad">${label}</div>`;
 }
 async function uploadFile(bucket, file){
@@ -722,16 +723,18 @@ function buildSpotlightSlideshow(containerEl, staffList){
   }
   const slideHtml = (sp,i) => `<div class="spotlight-slide absolute inset-0 transition-opacity duration-700 cursor-pointer ${i===0?'opacity-100':'opacity-0'}" data-id="${sp.id}" style="${i===0?'':'pointer-events:none;'}">
     ${sp.photo_url
-      ? `<img src="${esc(sp.photo_url)}" class="absolute inset-0 w-full h-full object-cover">`
+      ? `<img src="${esc(sp.photo_url)}" class="absolute inset-0 w-full h-full photo-top">`
       : `<div class="absolute inset-0 brand-grad"></div>
          <div class="absolute inset-0 flex items-center justify-center">
            <div class="w-24 h-24 rounded-full flex items-center justify-center text-white font-black text-3xl border-4" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);">${initials(sp.full_name)}</div>
          </div>`}
     <div class="absolute top-4 right-4 badge" style="background:rgba(255,255,255,.92);color:var(--knosk-navy);">${(sp.track||'').toUpperCase()}</div>
-    <div class="absolute bottom-0 left-0 right-0 p-5" style="background:linear-gradient(to top, rgba(4,14,28,.9), transparent);">
-      <div class="text-white font-extrabold text-lg leading-tight text-outline">${esc(sp.full_name)}</div>
-      <div class="text-sm mb-3 text-outline" style="color:#eaf2ff;">${esc(sp.job_title||'')}</div>
-      <span class="badge" style="background:var(--knosk-gold);color:#12253f;">${sp.monthly_salary? '₦'+Number(sp.monthly_salary).toLocaleString() : 'Salary not set'}</span>
+    <div class="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between gap-3" style="background:linear-gradient(to top, rgba(4,14,28,.9), transparent);">
+      <div class="min-w-0">
+        <div class="text-white font-extrabold text-lg leading-tight text-outline truncate">${esc(sp.full_name)}</div>
+        <div class="text-sm text-outline truncate" style="color:#eaf2ff;">${esc(sp.job_title||'')}</div>
+      </div>
+      <span class="badge flex-shrink-0" style="background:#fff;color:#12253f;">${sp.monthly_salary? '₦'+Number(sp.monthly_salary).toLocaleString() : 'Salary not set'}</span>
     </div>
   </div>`;
   containerEl.innerHTML = staffList.map(slideHtml).join('');
@@ -1338,9 +1341,9 @@ async function renderStaffProfile(staffId){
   const overallPct = tasks.length ? Math.round(taskDone/tasks.length*100) : (sp.status==='active'?100:0);
 
   document.getElementById('profileRoot').innerHTML = `
-    <div class="card overflow-hidden relative mb-5" style="min-height:260px;">
+    <div class="card overflow-hidden relative mb-5" style="min-height:340px;">
       ${sp.photo_url
-        ? `<img src="${esc(sp.photo_url)}" class="absolute inset-0 w-full h-full object-cover">`
+        ? `<img src="${esc(sp.photo_url)}" class="absolute inset-0 w-full h-full photo-top">`
         : `<div class="absolute inset-0 brand-grad"></div>
            <div class="absolute inset-0 flex items-center justify-center">
              <div class="w-28 h-28 rounded-full flex items-center justify-center text-white font-black text-4xl border-4" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);">${initials(sp.full_name)}</div>
