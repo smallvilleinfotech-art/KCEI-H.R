@@ -17,8 +17,8 @@
 <style>
   :root{
     --knosk-navy:#0c2a52;       /* deep blue ink — headings, active pill, buttons, dark cards */
-    --knosk-blue:#1f5fa8;       /* primary blue accent — fills, rings, highlights */
-    --knosk-blue-light:#4f8ddb; /* lighter blue — gradient stops, hovers */
+    --knosk-blue:#12335e;       /* secondary navy accent — fills, rings, highlights (was blue, now navy family) */
+    --knosk-blue-light:#2c4d7a; /* lighter navy — gradient stops, hovers (was light blue, now navy family) */
     --knosk-gold:#f2a900;       /* KNOSK gold — logo, salary badge, highlights */
     --knosk-gold-light:#ffc94d;
     --knosk-bg:#f2f6fb;         /* light blue-white surface fill */
@@ -37,7 +37,7 @@
   ::-webkit-scrollbar-thumb{background:rgba(12,42,82,.25);border-radius:8px;}
   .brand-grad{background:linear-gradient(160deg,var(--knosk-navy) 0%,#163a63 55%,var(--knosk-blue) 130%);}
   .gold-grad{background:linear-gradient(135deg,var(--knosk-gold) 0%,var(--knosk-gold-light) 100%);}
-  .green-grad{background:linear-gradient(135deg,var(--knosk-blue) 0%,var(--knosk-blue-light) 100%);} /* kept name for compatibility, now blue */
+  .green-grad{background:linear-gradient(135deg,var(--knosk-blue) 0%,var(--knosk-blue-light) 100%);} /* kept name for compatibility, now navy tint (pure navy+gold theme) */
   .text-outline{text-shadow:0 1px 3px rgba(0,0,0,.65), 0 0 10px rgba(0,0,0,.35), 0 2px 1px rgba(0,0,0,.4);}
   .photo-top{object-fit:cover;object-position:top center;}
   .card{background:#fff;border:1px solid var(--knosk-line);border-radius:18px;box-shadow:0 1px 2px rgba(16,38,72,.05), 0 10px 28px -12px rgba(12,30,60,.14);}
@@ -64,13 +64,13 @@
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--knosk-gold);box-shadow:0 0 0 4px rgba(242,169,0,.15);}
   label.field-label{font-size:13px;font-weight:700;color:#5b6f8c;margin-bottom:6px;display:block;}
   .tab-scroll::-webkit-scrollbar{display:none;}
-  .pill-track-ngo{background:#e7f0ff;color:#1f5fa8;}
+  .pill-track-ngo{background:#eef1f6;color:var(--knosk-navy);}
   .pill-track-school{background:#fff3d6;color:#a06b00;}
-  .sev-info{background:#e7f0ff;color:#1f5fa8;}
+  .sev-info{background:#eef1f6;color:var(--knosk-navy);}
   .sev-warning{background:#fff3d6;color:#a06b00;}
   .sev-critical{background:#fde3e3;color:#b3261e;}
   .status-active{background:#e3f8ea;color:#1a7f43;}
-  .status-onboarding{background:#e7f0ff;color:#1f5fa8;}
+  .status-onboarding{background:#eef1f6;color:var(--knosk-navy);}
   .status-probation{background:#fff3d6;color:#a06b00;}
   .status-offboarding{background:#fde3e3;color:#b3261e;}
   .status-departed{background:#eceff4;color:#5b6f8c;}
@@ -146,6 +146,7 @@ const ACCESS_TYPES = ['whatsapp_group','email','shared_drive','platform_login','
 const ACCESS_STATUSES = ['active','revoked','pending'];
 const OFFBOARD_REASONS = ['resignation','dismissal','end_of_probation','end_of_contract','internal_reassignment'];
 const SEVERITIES = ['info','warning','critical'];
+const ATTENDANCE_STATUSES = ['present','absent','leave','holiday'];
 const APP_ROLES = ['super_admin','hr_admin','department_lead','viewer'];
 
 const NAV = [
@@ -155,6 +156,7 @@ const NAV = [
   {key:'documents', label:'Documents', icon:'📁'},
   {key:'access_items', label:'Access Inventory', icon:'🔑'},
   {key:'onboarding_cases', label:'Onboarding', icon:'🚪'},
+  {key:'attendance', label:'Attendance', icon:'🗓️'},
   {key:'offboarding_cases', label:'Offboarding', icon:'🏁'},
   {key:'reassignments', label:'Reassignments', icon:'🔀'},
   {key:'organogram', label:'Live Organogram (3D)', icon:'🌐'},
@@ -362,6 +364,21 @@ const ENTITIES = {
       {key:'completed_at', label:'Completed', type:'date'},
     ]
   },
+  attendance: {
+    table:'attendance', title:'Attendance', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'date', asc:false},
+    columns:[
+      {key:'staff', label:'Staff', render:v=>v?.full_name||'—'},
+      {key:'date', label:'Date'},
+      {key:'status', label:'Status', render:v=>attendanceStatusBadge(v)},
+      {key:'notes', label:'Notes'},
+    ],
+    fields:[
+      {key:'staff_id', label:'Staff', type:'select', optionsFn:staffOptions, required:true},
+      {key:'date', label:'Date', type:'date', required:true},
+      {key:'status', label:'Status', type:'select', options:ATTENDANCE_STATUSES.map(t=>({value:t,label:t})), required:true},
+      {key:'notes', label:'Notes', type:'textarea'},
+    ]
+  },
   offboarding_cases: {
     table:'offboarding_cases', title:'Offboarding Tracker', pk:'id', select:'*, staff:staff_id(full_name)', order:{col:'created_at', asc:false},
     columns:[
@@ -462,6 +479,10 @@ function docStatusBadge(v){
 }
 function accessStatusBadge(v){
   const map={active:'status-active', revoked:'status-departed', pending:'sev-warning'};
+  return `<span class="badge ${map[v]||'sev-info'}">${v}</span>`;
+}
+function attendanceStatusBadge(v){
+  const map={present:'status-active', absent:'sev-critical', leave:'sev-warning', holiday:'sev-info'};
   return `<span class="badge ${map[v]||'sev-info'}">${v}</span>`;
 }
 function esc(s){ return (s===null||s===undefined) ? '' : String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -802,12 +823,21 @@ async function renderDashboard(){
       <div id="deptCard" class="card p-5"></div>
       <div id="probationCard" class="card p-5 flex flex-col items-center text-center justify-center"></div>
       <div id="checklistCard" class="card p-5 xl:row-span-2 flex flex-col" style="background:var(--knosk-navy);border:none;min-height:225px;"></div>
+      <div id="attendanceWeekCard" class="card p-5"></div>
+      <div id="attendancePaydayCard" class="card p-5 flex flex-col items-center text-center justify-center"></div>
       <div class="card p-5" id="accordionCard"><h3 class="font-bold text-base mb-1">Quick Panels</h3></div>
       <div class="card p-5 xl:col-span-2" id="keyDatesCard"><h3 class="font-bold text-base mb-3">Key Dates</h3></div>
     </div>
   </div>`);
 
   const today = new Date();
+  // Monday-start week window and calendar-month window, for attendance widgets
+  const weekStart = new Date(today); weekStart.setDate(today.getDate() - ((today.getDay()+6)%7)); weekStart.setHours(0,0,0,0);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthEnd = new Date(today.getFullYear(), today.getMonth()+1, 0);
+  const fmtISODate = d => d.toISOString().slice(0,10);
+
   const [
     {data: staffAll},
     {data: alertsOpen},
@@ -818,6 +848,8 @@ async function renderDashboard(){
     {data: docsPending, count: docsCount},
     {data: deptsNoJd, count: deptsNoJdCount},
     {data: offboardingDates},
+    {data: attendanceWeek},
+    {data: attendanceMonth},
   ] = await Promise.all([
     supabase.from('staff').select('id, full_name, job_title, track, status, monthly_salary, photo_url, department_id, department:department_id(name)').order('created_at',{ascending:false}),
     supabase.from('alerts').select('*, staff:staff_id(full_name)').eq('resolved', false).order('severity',{ascending:false}).limit(20),
@@ -828,6 +860,8 @@ async function renderDashboard(){
     supabase.from('documents').select('id', {count:'exact'}).in('status', ['missing','pending']),
     supabase.from('departments').select('id', {count:'exact'}).eq('jd_on_file', false),
     supabase.from('offboarding_cases').select('last_working_day, staff:staff_id(full_name)').neq('status','closed').not('last_working_day','is',null),
+    supabase.from('attendance').select('date, status').gte('date', fmtISODate(weekStart)).lte('date', fmtISODate(weekEnd)),
+    supabase.from('attendance').select('date, status').gte('date', fmtISODate(monthStart)).lte('date', fmtISODate(monthEnd)),
   ]);
 
   const total = staffAll?.length || 0;
@@ -884,6 +918,41 @@ async function renderDashboard(){
       <button class="icon-btn" style="width:36px;height:36px;font-size:14px;" onclick="renderDashboard()" title="Refresh">↻</button>
     </div>`;
   document.getElementById('probationCard').querySelector('[data-route-to]')?.addEventListener('click', ()=>{ state.route='staff'; router(); });
+
+  /* --- weekly attendance bar chart (days present, not hours) --- */
+  const weekDayLabels = Array.from({length:7},(_,i)=>{ const d=new Date(weekStart); d.setDate(weekStart.getDate()+i); return d; });
+  const presentByDay = weekDayLabels.map(d=>{
+    const key = fmtISODate(d);
+    return (attendanceWeek||[]).filter(a=>a.date===key && a.status==='present').length;
+  });
+  const maxPresent = Math.max(1, total, ...presentByDay);
+  const weekTotalPresentDays = presentByDay.reduce((a,b)=>a+b,0);
+  const todayIdx = weekDayLabels.findIndex(d=>d.toDateString()===today.toDateString());
+  document.getElementById('attendanceWeekCard').innerHTML = `
+    <div class="flex items-center justify-between mb-1"><h3 class="font-bold">Weekly Attendance</h3><span class="text-slate-300">↗</span></div>
+    <div class="text-2xl font-extrabold" style="color:var(--knosk-navy)">${weekTotalPresentDays}<span class="text-xs font-semibold text-slate-400 ml-1">staff-days present this week</span></div>
+    <div class="flex items-end gap-2.5 h-24 mt-6 relative">
+      ${weekDayLabels.map((d,i)=>`<div class="flex-1 flex flex-col items-center justify-end h-full relative">
+          <div class="w-full rounded-full transition-all" style="height:${Math.max(6, presentByDay[i]/maxPresent*80)}px;background:${i===todayIdx?'var(--knosk-gold)':'#e9edf3'}"></div>
+        </div>`).join('')}
+    </div>
+    <div class="flex gap-2.5 mt-2 text-[10px] text-slate-400 font-medium">
+      ${weekDayLabels.map(d=>`<span class="flex-1 text-center">${d.toLocaleDateString(undefined,{weekday:'narrow'})}</span>`).join('')}
+    </div>`;
+
+  /* --- monthly attendance % + next payday ring (days & monthly salary, not hourly) --- */
+  const workingDaysSoFar = Array.from({length: Math.min(today.getDate(), monthEnd.getDate())}, (_,i)=> new Date(today.getFullYear(), today.getMonth(), i+1))
+    .filter(d=> d.getDay()!==0 && d.getDay()!==6 && d<=today).length;
+  const presentDaysMonth = (attendanceMonth||[]).filter(a=>a.status==='present').length;
+  const monthAttendancePct = workingDaysSoFar ? clamp(Math.round(presentDaysMonth / (workingDaysSoFar*Math.max(total,1)) * 100), 0, 100) : 0;
+  const nextPayday = new Date(today.getFullYear(), today.getMonth()+1, 0); // last day of month
+  let daysToPayday = daysBetween(today.toISOString(), nextPayday.toISOString());
+  if(daysToPayday < 0){ daysToPayday = 0; }
+  document.getElementById('attendancePaydayCard').innerHTML = `
+    <h3 class="font-bold self-start mb-2 w-full text-left">Attendance &amp; Payday</h3>
+    ${ringHtml(monthAttendancePct, 92, 'var(--knosk-gold)', 'this month')}
+    <div class="mt-2.5 text-sm font-semibold px-2">${daysToPayday===0?'Payday today':`Payday in ${daysToPayday}d`}</div>
+    <div class="text-[11px] text-slate-400 mt-0.5">Paid monthly — not hourly</div>`;
 
   /* --- dark card: onboarding overview (top) + task checklist (bottom), one tall column --- */
   const onboardTotal = onboardOpen?.length || 0;
@@ -982,7 +1051,7 @@ async function renderDashboard(){
   });
   events.sort((a,b)=> new Date(a.date) - new Date(b.date));
   const typeColor = {probation:'sev-info', guarantor:'sev-warning', offboarding:'sev-critical'};
-  const typeDot = {probation:'#1f5fa8', guarantor:'#a06b00', offboarding:'#b3261e'};
+  const typeDot = {probation:'#0c2a52', guarantor:'#a06b00', offboarding:'#b3261e'};
 
   // 7-day strip starting today
   const weekDays = Array.from({length:7}, (_,i)=>{ const d=new Date(today); d.setDate(d.getDate()+i); return d; });
@@ -1179,7 +1248,7 @@ async function buildOrgChart(filterTrack){
   currentOrgControls = controls;
 
   // connector lines
-  const lineMat = new THREE.LineBasicMaterial({color:0x3f7fd1, transparent:true, opacity:0.6});
+  const lineMat = new THREE.LineBasicMaterial({color:0x2c4d7a, transparent:true, opacity:0.6});
   const lineGroup = new THREE.Group(); scene.add(lineGroup);
   function addLine(a,b){
     const geo = new THREE.BufferGeometry().setFromPoints([
@@ -1188,7 +1257,7 @@ async function buildOrgChart(filterTrack){
     lineGroup.add(new THREE.Line(geo, lineMat));
   }
 
-  const colorMap = {blue:['#1f5fa8','#3f7fd1'], green:['#0a7d72','#12a894'], gold:['#c98600','#f2a900'], neutral:['#3a4a63','#5a6d8c']};
+  const colorMap = {blue:['#0c2a52','#2c4d7a'], green:['#0a7d72','#12a894'], gold:['#c98600','#f2a900'], neutral:['#3a4a63','#5a6d8c']};
   const cssObjects = [];
   function colorFor(hint){ return colorMap[hint] || colorMap.neutral; }
 
@@ -1370,7 +1439,7 @@ async function renderStaffProfile(staffId){
         <h3 class="font-bold text-lg mb-1">Live Metrics</h3>
         <p class="text-xs text-slate-400 mb-2">Updates instantly as records change elsewhere in the system.</p>
         ${iso3dBarChart([
-          {label:'Tenure (d)', value: tenureDays??0, max: Math.max(tenureDays??0,365), color:'#1f5fa8'},
+          {label:'Tenure (d)', value: tenureDays??0, max: Math.max(tenureDays??0,365), color:'#0c2a52'},
           {label:'Docs Filed', value: docsOnFile, max: Math.max((docs||[]).length,1), color:'#f2a900'},
           {label:'Access', value: accessActiveCt, max: Math.max(accessActiveCt,5), color:'#1a7f43'},
           {label:'Alerts', value: alertCt, max: Math.max(alertCt,3), color:'#b3261e'},
@@ -1452,7 +1521,7 @@ function reportShellOpen(title){
     table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
     th{background:#f2f6fb;text-align:left;padding:8px 10px;font-size:10.5px;text-transform:uppercase;color:#5b6f8c;}
     td{padding:8px 10px;border-bottom:1px solid #eef2f8;}
-    .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:700;background:#e7f0ff;color:#1f5fa8;}
+    .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:700;background:#eef1f6;color:#0c2a52;}
     .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eef2f8;font-size:13px;}
     .kv span:first-child{color:#5b6f8c;}
     .kv span:last-child{font-weight:700;}
