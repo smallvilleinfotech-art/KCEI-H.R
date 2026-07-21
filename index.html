@@ -93,7 +93,7 @@
   details.acc .acc-body{padding-top:10px;font-size:13.5px;color:#5b6f8c;line-height:1.5;}
 
   /* --- top nav bar --- */
-  .topnav-item{padding:10px 17px;border-radius:999px;font-size:14px;font-weight:600;color:#5b6f8c;white-space:nowrap;cursor:pointer;transition:.15s;flex-shrink:0;}
+  .topnav-item{padding:9px 15px;border-radius:999px;font-size:13.5px;font-weight:600;color:#5b6f8c;white-space:nowrap;cursor:pointer;transition:.15s;flex-shrink:0;}
   .topnav-item:hover{background:#eef3fb;color:var(--knosk-navy);}
   .topnav-item.active{background:var(--knosk-navy);color:#fff;box-shadow:0 4px 12px -4px rgba(12,42,82,.5);}
   .icon-btn{width:42px;height:42px;border-radius:50%;background:#f3f6fb;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:1px solid var(--knosk-line);transition:.15s;position:relative;flex-shrink:0;}
@@ -474,8 +474,8 @@ const app = document.getElementById('app');
 function renderShell(innerHtml){
   app.innerHTML = `
   <div class="min-h-screen">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6">
-      <div class="card !rounded-full flex items-center gap-2 px-3 py-2.5 mb-8">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 pt-4">
+      <div class="card !rounded-full flex items-center gap-2 px-3 py-2 mb-5">
         <div class="flex items-center gap-2.5 pl-1 pr-2 flex-shrink-0">
           <div class="w-9 h-9 rounded-full gold-grad flex items-center justify-center font-black text-sm" style="color:var(--knosk-navy)">K</div>
           <span class="font-extrabold hidden sm:inline text-[15px]" style="color:var(--knosk-navy)">KNOSK</span>
@@ -489,7 +489,7 @@ function renderShell(innerHtml){
           <button id="avatarBtn" class="avatar-circle" title="Sign out">${initials(currentAppUser?.full_name||session?.user?.email)}</button>
         </div>
       </div>
-      <main class="pb-16">
+      <main class="pb-10">
         ${innerHtml}
       </main>
     </div>
@@ -736,29 +736,23 @@ function bigStatHtml(icon, value, label){
 
 async function renderDashboard(){
   renderShell(`<div id="pageRoot">
-    <div class="mb-8">
-      <h1 class="text-3xl font-extrabold tracking-tight" style="color:var(--knosk-navy)">Welcome in, ${esc((currentAppUser?.full_name||'').split(' ')[0]||'')}</h1>
-      <p class="text-[15px] text-slate-500 mt-1">Here's where KNOSK's people stand today.</p>
+    <div class="mb-5">
+      <h1 class="text-2xl font-extrabold tracking-tight" style="color:var(--knosk-navy)">Welcome in, ${esc((currentAppUser?.full_name||'').split(' ')[0]||'')}</h1>
+      <p class="text-[14px] text-slate-500 mt-0.5">Here's where KNOSK's people stand today.</p>
     </div>
 
-    <div class="card p-6 mb-6 flex flex-wrap items-center justify-between gap-6">
-      <div id="capsuleRow" class="flex flex-wrap items-center gap-7"></div>
-      <div id="bigStatsRow" class="flex flex-wrap items-center gap-8"></div>
+    <div class="card p-5 mb-4 flex flex-wrap items-center justify-between gap-6">
+      <div id="capsuleRow" class="flex flex-wrap items-center gap-6"></div>
+      <div id="bigStatsRow" class="flex flex-wrap items-center gap-7"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-      <div id="spotlightCard" class="card overflow-hidden relative" style="min-height:260px;"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div id="spotlightCard" class="card overflow-hidden relative" style="min-height:225px;"></div>
       <div id="deptCard" class="card p-5"></div>
       <div id="probationCard" class="card p-5 flex flex-col items-center text-center justify-center"></div>
-      <div id="onboardCard" class="card p-5"></div>
-    </div>
-
-    <div id="checklistCard" class="card p-6 mb-6" style="background:var(--knosk-navy);border:none;"></div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <div class="card p-6" id="accordionCard"><h3 class="font-bold text-lg mb-2">Quick Panels</h3></div>
-      <div class="card p-6" id="keyDatesCard"><h3 class="font-bold text-lg mb-4">Key Dates — Next 14 Days</h3></div>
-      <div class="card p-6" id="alertsCard"><h3 class="font-bold text-lg mb-4">Open Alerts &amp; Flags</h3></div>
+      <div id="checklistCard" class="card p-5 xl:row-span-2 flex flex-col" style="background:var(--knosk-navy);border:none;min-height:225px;"></div>
+      <div class="card p-5" id="accordionCard"><h3 class="font-bold text-base mb-1">Quick Panels</h3></div>
+      <div class="card p-5 xl:col-span-2" id="keyDatesCard"><h3 class="font-bold text-base mb-3">Key Dates</h3></div>
     </div>
   </div>`);
 
@@ -847,58 +841,74 @@ async function renderDashboard(){
     probLabel = `${esc(onProbation.full_name)} — ${daysLeft>=0?daysLeft+'d left':'review overdue'}`;
   }
   document.getElementById('probationCard').innerHTML = `
-    <h3 class="font-bold self-start mb-3 w-full text-left">Probation Watch</h3>
-    ${ringHtml(probPct, 100, 'var(--knosk-blue)')}
-    <div class="mt-3 text-sm font-semibold">${probLabel}</div>`;
+    <h3 class="font-bold self-start mb-2 w-full text-left">Probation Watch</h3>
+    ${ringHtml(probPct, 92, 'var(--knosk-blue)')}
+    <div class="mt-2.5 text-sm font-semibold px-2">${probLabel}</div>
+    <div class="flex items-center gap-2 mt-3">
+      <button class="icon-btn" style="width:36px;height:36px;font-size:14px;" data-route-to="staff" title="View Staff Registry">👤</button>
+      <button class="icon-btn" style="width:36px;height:36px;font-size:14px;" onclick="renderDashboard()" title="Refresh">↻</button>
+    </div>`;
+  document.getElementById('probationCard').querySelector('[data-route-to]')?.addEventListener('click', ()=>{ state.route='staff'; router(); });
 
-  /* --- onboarding donut card --- */
+  /* --- dark card: onboarding overview (top) + task checklist (bottom), one tall column --- */
   const onboardTotal = onboardOpen?.length || 0;
   const gatesPassed = (onboardOpen||[]).filter(c=>c.gate_passed).length;
   const profileOnly = (onboardOpen||[]).filter(c=>!c.gate_passed && c.staff_profile_activated).length;
   const earlyStage = onboardTotal - gatesPassed - profileOnly;
   const onboardPct = onboardTotal? Math.round(gatesPassed/onboardTotal*100) : 0;
-  const pct = n => onboardTotal? Math.round(n/onboardTotal*100) : 0;
-  document.getElementById('onboardCard').innerHTML = `
-    <div class="flex items-center justify-between mb-3"><h3 class="font-bold">Onboarding</h3><span class="font-extrabold" style="color:var(--knosk-navy)">${onboardPct}%</span></div>
-    ${onboardTotal ? `
-    <div class="flex h-9 rounded-full overflow-hidden w-full mb-2.5">
-      <div style="width:${Math.max(pct(gatesPassed),gatesPassed?4:0)}%;background:var(--knosk-blue)"></div>
-      <div style="width:${Math.max(pct(profileOnly),profileOnly?4:0)}%;background:var(--knosk-navy)"></div>
-      <div style="width:${Math.max(pct(earlyStage),earlyStage?4:0)}%;background:#e3ece5"></div>
-    </div>
-    <div class="flex justify-between text-[10px] text-slate-400 font-semibold mb-3">
-      <span>${pct(gatesPassed)}% Gate Passed</span><span>${pct(profileOnly)}% Profile Active</span><span>${pct(earlyStage)}% Early</span>
-    </div>` : `<div class="capsule-track mb-4" style="width:100%"><div class="capsule-fill" style="width:6%;background:#e3ece5"></div></div>`}
-    <div class="grid grid-cols-3 gap-2 text-center">
-      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${onboardTotal}</div><div class="text-[10.5px] text-slate-400 font-medium">Open</div></div>
-      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${gatesPassed}</div><div class="text-[10.5px] text-slate-400 font-medium">Gate Passed</div></div>
-      <div><div class="font-extrabold text-base" style="color:var(--knosk-navy)">${Math.max(earlyStage+profileOnly,0)}</div><div class="text-[10.5px] text-slate-400 font-medium">In Progress</div></div>
-    </div>`;
+  const opct = n => onboardTotal? Math.round(n/onboardTotal*100) : 0;
 
-  /* --- dark onboarding checklist card --- */
+  const overviewHtml = `
+    <div class="flex items-center justify-between mb-2.5">
+      <h3 class="font-bold text-white">Onboarding</h3>
+      <span class="font-extrabold text-white">${onboardPct}%</span>
+    </div>
+    ${onboardTotal ? `
+    <div class="flex h-7 rounded-full overflow-hidden w-full mb-2">
+      <div style="width:${Math.max(opct(gatesPassed),gatesPassed?4:0)}%;background:var(--knosk-gold)"></div>
+      <div style="width:${Math.max(opct(profileOnly),profileOnly?4:0)}%;background:rgba(255,255,255,.5)"></div>
+      <div style="width:${Math.max(opct(earlyStage),earlyStage?4:0)}%;background:rgba(255,255,255,.14)"></div>
+    </div>
+    <div class="flex justify-between text-[9.5px] text-blue-200 font-semibold mb-3">
+      <span>${opct(gatesPassed)}% Gate</span><span>${opct(profileOnly)}% Active</span><span>${opct(earlyStage)}% Early</span>
+    </div>` : `<div class="h-7 rounded-full w-full mb-3" style="background:rgba(255,255,255,.1)"></div>`}`;
+
   const showcase = onboardOpen && onboardOpen[0];
+  let taskListHtml;
   if(showcase){
     const {data: tasks} = await supabase.from('onboarding_tasks').select('*').eq('onboarding_case_id', showcase.id).order('sort_order');
     const done = (tasks||[]).filter(t=>t.completed).length;
-    document.getElementById('checklistCard').innerHTML = `
-      <div class="flex items-center justify-between mb-5">
-        <div><h3 class="font-bold text-white text-lg">Onboarding — ${esc(showcase.staff?.full_name||'Unnamed')}</h3><p class="text-blue-200 text-xs mt-0.5">Stage: ${esc(showcase.stage)}</p></div>
-        <span class="badge" style="background:rgba(255,255,255,.14);color:#fff;">${done}/${(tasks||[]).length}</span>
+    taskListHtml = `
+      <div class="flex items-center justify-between mb-3 pt-3 border-t border-white/10">
+        <div class="min-w-0"><div class="text-sm font-bold text-white truncate">${esc(showcase.staff?.full_name||'Unnamed')}</div><div class="text-[11px] text-blue-200">Stage: ${esc(showcase.stage)}</div></div>
+        <span class="badge flex-shrink-0" style="background:rgba(255,255,255,.14);color:#fff;">${done}/${(tasks||[]).length}</span>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+      <div class="space-y-2 overflow-y-auto flex-1" style="max-height:220px;">
         ${(tasks&&tasks.length) ? tasks.map(t=>`
-          <div class="flex items-center justify-between p-3.5 rounded-xl" style="background:rgba(255,255,255,.07);">
-            <div class="pr-3"><div class="text-sm font-semibold text-white">${esc(t.task_name)}</div>${t.week_label?`<div class="text-[11px] text-blue-200 mt-0.5">${esc(t.week_label)}</div>`:''}</div>
-            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:${t.completed?'var(--knosk-gold)':'rgba(255,255,255,.15)'};color:${t.completed?'#12253f':'#fff'}">${t.completed?'✓':''}</span>
-          </div>`).join('') : `<div class="text-blue-200 text-sm md:col-span-2">No tasks logged yet for this case — add Week 1/2 tasks from the Onboarding tab.</div>`}
+          <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,.07);">
+            <div class="pr-3 min-w-0"><div class="text-[13px] font-semibold text-white truncate">${esc(t.task_name)}</div>${t.week_label?`<div class="text-[10.5px] text-blue-200 mt-0.5">${esc(t.week_label)}</div>`:''}</div>
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0" style="background:${t.completed?'var(--knosk-gold)':'rgba(255,255,255,.15)'};color:${t.completed?'#12253f':'#fff'}">${t.completed?'✓':''}</span>
+          </div>`).join('') : `<div class="text-blue-200 text-xs">No tasks logged yet — add Week 1/2 tasks from the Onboarding tab.</div>`}
       </div>`;
   } else {
-    document.getElementById('checklistCard').innerHTML = `<div class="text-white/80 text-sm">No open onboarding cases right now — all clear.</div>`;
+    taskListHtml = `<div class="text-white/70 text-xs pt-3 border-t border-white/10">No open onboarding cases right now — all clear.</div>`;
   }
+  document.getElementById('checklistCard').innerHTML = overviewHtml + taskListHtml;
 
-  /* --- accordion quick panels --- */
+  /* --- accordion quick panels (alerts folded in first, so no separate card needed) --- */
   document.getElementById('accordionCard').innerHTML += `
     <details class="acc" open>
+      <summary>Alerts &amp; Flags <span class="text-slate-400 font-semibold">${alertsOpen?.length??0} open</span></summary>
+      <div class="acc-body">
+        ${!alertsOpen || alertsOpen.length===0 ? `<div class="text-slate-400">No open alerts. All clear.</div>` :
+          `<div class="space-y-2">${alertsOpen.slice(0,4).map(a=>`
+            <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-50">
+              <div class="min-w-0"><span class="badge sev-${a.severity} mr-1.5">${a.severity}</span><span class="text-[12.5px] font-medium">${esc(a.message)}</span></div>
+              <button class="btn-ghost text-[11px] flex-shrink-0 !py-1 !px-2" data-resolve="${a.id}">Resolve</button>
+            </div>`).join('')}</div>`}
+      </div>
+    </details>
+    <details class="acc">
       <summary>Access Inventory <span class="text-slate-400 font-semibold">${accessCount??0} active</span></summary>
       <div class="acc-body">Live grants across WhatsApp groups, drives, and platform logins. Review before every offboarding case closes.</div>
     </details>
@@ -962,20 +972,8 @@ async function renderDashboard(){
       <span class="badge ${typeColor[e.type]}">${e.type}</span>
     </div>`).join('') : `<div class="text-sm text-slate-400 py-4 text-center">Nothing due in the next 14 days.</div>`;
 
-  document.getElementById('keyDatesCard').innerHTML += stripHtml + listHtml;
+  document.getElementById('keyDatesCard').innerHTML += stripHtml.replace('mb-5','mb-3') + listHtml;
 
-  /* --- alerts card --- */
-  document.getElementById('alertsCard').innerHTML += !alertsOpen || alertsOpen.length===0
-    ? `<div class="text-sm text-slate-400 py-6 text-center">No open alerts. All clear.</div>`
-    : `<div class="space-y-3">${alertsOpen.slice(0,6).map(a=>`
-        <div class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border border-slate-100 bg-slate-50">
-          <div class="min-w-0">
-            <div class="flex items-center gap-2 mb-1"><span class="badge sev-${a.severity}">${a.severity}</span></div>
-            <div class="text-[13.5px] font-semibold truncate">${esc(a.message)}</div>
-            <div class="text-[12px] text-slate-400 mt-0.5">${esc(a.staff?.full_name||'')}</div>
-          </div>
-          <button class="btn-ghost text-xs flex-shrink-0" data-resolve="${a.id}">Resolve</button>
-        </div>`).join('')}</div>`;
   document.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click', async ()=>{
     await supabase.from('alerts').update({resolved:true, resolved_at:new Date().toISOString()}).eq('id', b.dataset.resolve);
     renderDashboard();
